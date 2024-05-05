@@ -182,7 +182,7 @@ class KuronimeProvider : MainAPI() {
             ?.substringAfter("\"")?.substringBefore("\";")
             ?: throw ErrorLoadingException("No id found")
         val servers = app.post(
-            "$animekuUrl/afi.php", data = mapOf(
+            "$animekuUrl/v3.1.php", data = mapOf(
                 "id" to id
             ), referer = "$mainUrl/"
         ).parsedSafe<Servers>()
