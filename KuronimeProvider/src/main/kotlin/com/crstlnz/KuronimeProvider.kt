@@ -13,7 +13,7 @@ import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
 import java.net.URI
-import java.util.ArrayList
+import java.util.ArrayList 
 
 class KuronimeProvider : MainAPI() {
     override var mainUrl = "https://tv1.kuronime.vip"
