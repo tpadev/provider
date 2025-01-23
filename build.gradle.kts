@@ -4,7 +4,7 @@ import com.android.build.gradle.BaseExtension
 apply(plugin = "com.lagradost.cloudstream3.gradle")
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.0" // Kotlin JVM
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
 }
 
 buildscript {
@@ -29,27 +29,6 @@ allprojects {
         mavenCentral()
         maven("https://jitpack.io")
     }
-}
-
-fun DependencyHandler.loadDependencies() {
-    val apkTasks = listOf("deployWithAdb", "build")
-    val useApk = gradle.startParameter.taskNames.any { taskName ->
-        apkTasks.any { apkTask ->
-            taskName.contains(apkTask, ignoreCase = true)
-        }
-    }
-    // If the task is specifically to compile the app then use the stubs, otherwise us the library.
-    if (!useApk) {
-        implementation("com.github.Blatzar:CloudstreamApi:0.1.6")
-    }
-
-    implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
-    implementation("com.github.Blatzar:NiceHttp:0.4.11") // http library
-    implementation("org.jsoup:jsoup:1.17.2") // html parser
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-    implementation("org.mozilla:rhino:1.7.14")
 }
 
 fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) =
@@ -80,8 +59,8 @@ subprojects {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
         }
 
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -97,13 +76,28 @@ subprojects {
     }
 
     dependencies {
-        loadDependencies()
         val implementation by configurations
         val apk by configurations
         apk("com.lagradost:cloudstream3:pre-release")
-    }
-}
 
-dependencies {
-    loadDependencies()
+        val apkTasks = listOf("deployWithAdb", "build")
+        val useApk = gradle.startParameter.taskNames.any { taskName ->
+            apkTasks.any { apkTask ->
+                taskName.contains(apkTask, ignoreCase = true)
+            }
+        }
+        // If the task is specifically to compile the app then use the stubs, otherwise us the library.
+        if (!useApk) {
+            implementation("com.github.Blatzar:CloudstreamApi:0.1.6")
+        }
+
+        implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
+        implementation("com.github.Blatzar:NiceHttp:0.4.11") // http library
+        implementation("org.jsoup:jsoup:1.17.2") // html parser
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+        implementation("org.mozilla:rhino:1.7.14")
+        implementation(project(":utils"))
+    }
 }

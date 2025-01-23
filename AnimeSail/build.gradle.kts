@@ -1,11 +1,8 @@
 // use an integer for version numbers
-version = 2
+version = 3
 
 android {
     namespace = "AnimeSail"
-}
-dependencies {
-    implementation(project(":"))
 }
 
 cloudstream {

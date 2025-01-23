@@ -4,7 +4,6 @@ import com.crstlnz.utils.getLastNumber
 import com.crstlnz.utils.loadAnimeSail
 import com.crstlnz.utils.splitTitles
 import com.crstlnz.utils.toAbsoluteURL
-import com.crstlnz.utils.toEmbedUrl
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.AnimeLoadResponse
 import com.lagradost.cloudstream3.DubStatus

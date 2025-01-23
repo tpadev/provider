@@ -4,9 +4,6 @@ version = 3
 android {
     namespace = "Anoboy"
 }
-dependencies {
-    implementation(project(":"))
-}
 
 cloudstream {
     language = "id"
