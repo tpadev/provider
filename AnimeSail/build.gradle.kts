@@ -1,5 +1,5 @@
 // use an integer for version numbers
-version = 1
+version = 2
 
 android {
     namespace = "AnimeSail"
@@ -29,5 +29,5 @@ cloudstream {
         "OVA",
     )
 
-    iconUrl = "https://anoboy.pro/assets/img/favicon.png"
+    iconUrl = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://animesail.com&size=64"
 }

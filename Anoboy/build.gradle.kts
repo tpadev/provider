@@ -29,5 +29,5 @@ cloudstream {
         "OVA",
     )
 
-    iconUrl = "https://anoboy.pro/assets/img/favicon.png"
+    iconUrl = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tv1.anoboy.app&size=64"
 }

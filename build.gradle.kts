@@ -106,7 +106,4 @@ subprojects {
 
 dependencies {
     loadDependencies()
-    val implementation by configurations
-    val apk by configurations
-    apk("com.lagradost:cloudstream3:pre-release")
 }
