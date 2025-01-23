@@ -45,7 +45,6 @@ subprojects {
 
         authors = listOf("Crstlnz")
 
-        requiresResources = true
         dependencies {
             if (name != "utils") {
                 val implementation by configurations
