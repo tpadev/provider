@@ -1,7 +1,16 @@
 package com.crstlnz.utils
 
+import android.content.Context
+import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
+import com.lagradost.cloudstream3.plugins.Plugin
 import java.net.URI
 import java.net.URL
+
+@CloudstreamPlugin
+class Dummy: Plugin() {
+    override fun load(context: Context) {
+    }
+}
 
 fun String.getLastNumber(): Int? {
     val regex = "\\d+".toRegex()

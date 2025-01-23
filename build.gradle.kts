@@ -3,10 +3,6 @@ import com.android.build.gradle.BaseExtension
 
 apply(plugin = "com.lagradost.cloudstream3.gradle")
 
-plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.0"
-}
-
 buildscript {
     repositories {
         google()
@@ -59,13 +55,13 @@ subprojects {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_18
+            targetCompatibility = JavaVersion.VERSION_18
         }
 
         tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             kotlinOptions {
-                jvmTarget = "1.8" // Required
+                jvmTarget = JavaVersion.VERSION_18.toString() // Required
                 // Disables some unnecessary features
                 freeCompilerArgs = freeCompilerArgs +
                         "-Xno-call-assertions" +
@@ -98,6 +94,9 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
         implementation("org.mozilla:rhino:1.7.14")
-        implementation(project(":utils"))
+
+        if (name != "utils") {
+            implementation(project(":utils"))
+        }
     }
 }
