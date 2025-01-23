@@ -176,7 +176,6 @@ class KuronimeProvider : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-
         val document = app.get(data).document
         val id = document.selectFirst("div#content script:containsData(is_singular)")?.data()
             ?.substringAfter("\"")?.substringBefore("\";")

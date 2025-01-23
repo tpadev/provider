@@ -1,5 +1,9 @@
-import com.lagradost.cloudstream3.gradle.CloudstreamExtension 
+import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import com.android.build.gradle.BaseExtension
+
+plugins {
+    id("org.jetbrains.kotlin.jvm") version "2.1.0" // Kotlin JVM
+}
 
 buildscript {
     repositories {
@@ -10,10 +14,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:8.8.0")
         // Cloudstream gradle plugin which makes everything work and builds plugins
-        classpath("com.github.recloudstream:gradle:master-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath("com.github.recloudstream:gradle:-SNAPSHOT")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
     }
 }
 
@@ -68,24 +72,40 @@ subprojects {
     }
 
     dependencies {
-        val apk by configurations
-        val implementation by configurations
+//        val apk by configurations
+//        val implementation by configurations
+//
+//        // Stubs for all Cloudstream classes
+//        apk("com.lagradost:cloudstream3:pre-release")
+        val apkTasks = listOf("deployWithAdb", "build")
+        val useApk = gradle.startParameter.taskNames.any { taskName ->
+            apkTasks.any { apkTask ->
+                taskName.contains(apkTask, ignoreCase = true)
+            }
+        }
 
-        // Stubs for all Cloudstream classes
+        val implementation by configurations
+        val apk by configurations
+
+        // If the task is specifically to compile the app then use the stubs, otherwise us the library.
         apk("com.lagradost:cloudstream3:pre-release")
+        if (!useApk) {
+            implementation("com.github.Blatzar:CloudstreamApi:0.1.6")
+        }
 
         // these dependencies can include any of those which are added by the app,
         // but you dont need to include any of them if you dont need them
         // https://github.com/recloudstream/cloudstream/blob/master/app/build.gradle
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
-        implementation("com.github.Blatzar:NiceHttp:0.3.2") // http library
-        implementation("org.jsoup:jsoup:1.17.1") // html parser
+        implementation("com.github.Blatzar:NiceHttp:0.4.11") // http library
+        implementation("org.jsoup:jsoup:1.17.2") // html parser
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
         implementation("org.mozilla:rhino:1.7.14")
-    }
-}
 
-task<Delete>("clean") {
-    delete(rootProject.buildDir)
+        testImplementation("org.junit.jupiter:junit-jupiter:5.10.1") // JUnit 5
+        testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+    }
 }

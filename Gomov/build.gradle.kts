@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.konan.properties.Properties
 version = 1
 
 android {
+    namespace = "Gomov"
     defaultConfig {
 //        val properties = Properties()
 //        properties.load(project.rootProject.file("local.properties").inputStream())

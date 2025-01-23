@@ -1,8 +1,11 @@
 // use an integer for version numbers
-version = 2
+version = 1
 
 android {
-    namespace = "IdlixProvider"
+    namespace = "Anoboy"
+}
+dependencies {
+    implementation(project(":"))
 }
 
 cloudstream {
@@ -21,11 +24,10 @@ cloudstream {
      * */
     status = 1 // will be 3 if unspecified
     tvTypes = listOf(
-        "TvSeries",
-        "Movie",
+        "AnimeMovie",
         "Anime",
-        "AsianDrama",
+        "OVA",
     )
 
-    iconUrl = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://idlixian.com&size=16"
+    iconUrl = "https://anoboy.pro/assets/img/favicon.png"
 }
