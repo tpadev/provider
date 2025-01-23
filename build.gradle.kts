@@ -44,6 +44,14 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/crsltnz/provider")
 
         authors = listOf("Crstlnz")
+
+        requiresResources = true
+        dependencies {
+            if (name != "utils") {
+                val implementation by configurations
+                implementation(project(":utils"))
+            }
+        }
     }
 
     android {
