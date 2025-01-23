@@ -2,6 +2,7 @@ package com.crstlnz
 
 import com.crstlnz.utils.getLastNumber
 import com.crstlnz.utils.isGofile
+import com.crstlnz.utils.toAbsoluteURL
 import com.crstlnz.utils.toEmbedUrl
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
@@ -67,15 +68,18 @@ class Anoboy : MainAPI() {
                     animeEl.attr("href"),
                     TvType.TvSeries,
                 ) {
-                    this.posterUrl =
-                        "$mainUrl${animeEl.selectFirst("amp-img")?.attr("src")?.convertHD()}"
+                    this.posterUrl = animeEl.selectFirst("amp-img")?.attr("src")?.convertHD(800)?.toAbsoluteURL(mainUrl)
                 }
             }
         }
     }
 
-    private fun String.convertHD(): String {
-        return replace(Regex("s\\d+"), "s600")
+    private fun String.convertHD(quality : Int = 600): String {
+        return replace(Regex("s\\d+"), "s$quality")
+    }
+
+    private fun String.removeYear(): String {
+        return replace("\\(\\d{4}\\)".toRegex(), "")
     }
 
     private fun Document.isWatchPage(): Boolean {
@@ -105,7 +109,7 @@ class Anoboy : MainAPI() {
 
     }
 
-    override suspend fun load(url: String): LoadResponse {
+    override suspend fun load(url: String): AnimeLoadResponse {
         val document = app.get(url).document
 
         val title = document.selectFirst(".entry-title")?.text().toString()
@@ -127,12 +131,16 @@ class Anoboy : MainAPI() {
             episodes.add(Episode(url, title))
         } else {
             val eps = document.select(".singlelink ul li").map {
-                Episode(
-                    (it.selectFirst("a")?.attr("href") ?: "").toString(),
-                    episode = it.ownText().getLastNumber()
-                )
+                if(it.ownText().lowercase().contains("download")){
+                    null
+                }else{
+                    Episode(
+                        (it.selectFirst("a")?.attr("href") ?: "").toString(),
+                        episode = it.ownText().getLastNumber()
+                    )
+                }
             }
-            episodes.addAll(eps)
+            episodes.addAll(eps.filterNotNull())
         }
 
         return newAnimeLoadResponse(title, url, getType(type)) {

@@ -1,5 +1,6 @@
 package com.crstlnz.utils
 
+import java.net.URI
 import java.net.URL
 
 fun String.getLastNumber(): Int? {
@@ -28,4 +29,34 @@ fun String.toEmbedUrl(): String {
         return "https://www.mp4upload.com/embed-$videoId.html"
     }
     return this
+}
+
+fun String.isUrlAbsolute(): Boolean {
+    try {
+        val uri = URI(this)
+        return uri.isAbsolute
+    } catch (e: Exception) {
+        // If the URL is not well-formed, we'll assume it's relative
+        return false
+    }
+}
+
+fun String.toAbsoluteURL(domain: String): String {
+    return if (isUrlAbsolute()) {
+        this
+    } else {
+        "$domain$this"
+    }
+}
+
+fun String.splitTitles(): Pair<String, String>? {
+    val regex = Regex("(.+)(?=,\\s[\\p{InHiragana}\\p{InKatakana}\\p{InCJKUnifiedIdeographs}].+)")
+    val matchResult = regex.find(this)
+    return if (matchResult != null) {
+        val firstTitle = matchResult.groupValues[1].trim()
+        val secondTitle = substring(firstTitle.length + 1).trim()
+        Pair(firstTitle, secondTitle)
+    } else {
+        Pair(this, this)
+    }
 }
