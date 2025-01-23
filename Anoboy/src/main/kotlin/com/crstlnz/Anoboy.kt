@@ -42,11 +42,11 @@ class Anoboy : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "/category/anime/" to "Episode Baru",
+        "/category/anime" to "Episode Baru",
         "/category/anime/ongoing" to "Ongoing",
         "/category/anime/ongoing" to "Ongoing",
         "/category/anime-movie" to "Anime Movie",
-        "/category/live-action-movie/" to "Live Action"
+        "/category/live-action-movie" to "Live Action"
     )
 
     override suspend fun getMainPage(
@@ -54,22 +54,28 @@ class Anoboy : MainAPI() {
         request: MainPageRequest
     ): HomePageResponse {
         val home = app.get(
-            "$mainUrl/category/anime/page/$page${request.data}",
+            "$mainUrl${request.data}/page/$page",
         ).document.toSearchResponses() ?: throw ErrorLoadingException("Invalid Json reponse")
         return newHomePageResponse(request.name, home)
     }
 
     private fun Document.toSearchResponses(): List<SearchResponse> {
-        return select(".column-content a").map { animeEl ->
-            return listOf(newAnimeSearchResponse(
-                animeEl.selectFirst(".ibox1")?.text() ?: "Error",
-                animeEl.attr("href"),
-                TvType.TvSeries,
-            ) {
-                this.posterUrl =
-                    selectFirst("amp-img")?.attr("src")?.replace(Regex("sX=s\\d+"), "sX=s600")
-            })
+        return select(".column-content").map { el ->
+            return el.select("a").map { animeEl ->
+                newAnimeSearchResponse(
+                    animeEl.selectFirst(".ibox1")?.text() ?: "Error",
+                    animeEl.attr("href"),
+                    TvType.TvSeries,
+                ) {
+                    this.posterUrl =
+                        "$mainUrl${animeEl.selectFirst("amp-img")?.attr("src")?.convertHD()}"
+                }
+            }
         }
+    }
+
+    private fun String.convertHD(): String {
+        return replace(Regex("s\\d+"), "s600")
     }
 
     private fun Document.isWatchPage(): Boolean {
