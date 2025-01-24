@@ -1,5 +1,5 @@
 // use an integer for version numbers
-version = 5
+version = 6
 
 android {
     namespace = "AnimeSail"
@@ -10,7 +10,7 @@ cloudstream {
     // All of these properties are optional, you can safely remove them
 
     // description = "Lorem Ipsum"
-     authors = listOf("Crstlnz")
+    authors = listOf("Crstlnz")
 
     /**
      * Status int as the following:
@@ -26,5 +26,6 @@ cloudstream {
         "OVA",
     )
 
-    iconUrl = "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://animesail.com&size=64"
+    iconUrl =
+        "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://animesail.com&size=64"
 }

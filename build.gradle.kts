@@ -20,11 +20,11 @@ buildscript {
 }
 
 allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://jitpack.io")
-    }
+//    repositories {
+//        google()
+//        mavenCentral()
+//        maven("https://jitpack.io")
+//    }
 }
 
 fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) =
@@ -44,13 +44,6 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/crsltnz/provider")
 
         authors = listOf("Crstlnz")
-
-        dependencies {
-            if (name != "utils") {
-                val implementation by configurations
-                implementation(project(":utils"))
-            }
-        }
     }
 
     android {
@@ -101,9 +94,6 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
         implementation("org.mozilla:rhino:1.7.14")
-
-        if (name != "utils") {
-            implementation(project(":utils"))
-        }
+        implementation("com.github.crstlnz.utils:Utils:674037c288")
     }
 }
