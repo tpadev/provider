@@ -13,7 +13,7 @@ import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.nodes.Element
 import java.net.URI
-import java.util.ArrayList 
+import java.util.ArrayList
 
 class KuronimeProvider : MainAPI() {
     override var mainUrl = "https://tv1.kuronime.vip"
@@ -132,8 +132,11 @@ class KuronimeProvider : MainAPI() {
         val poster = document.selectFirst("div.l[itemprop=image] > img")?.attr("data-src")
         val tags = document.select(".infodetail > ul > li:nth-child(2) > a").map { it.text() }
         val type =
-            getType(document.selectFirst(".infodetail > ul > li:nth-child(7)")?.ownText()?.removePrefix(":")
-                ?.lowercase()?.trim() ?: "tv")
+            getType(
+                document.selectFirst(".infodetail > ul > li:nth-child(7)")?.ownText()
+                    ?.removePrefix(":")
+                    ?.lowercase()?.trim() ?: "tv"
+            )
 
         val trailer = document.selectFirst("div.tply iframe")?.attr("data-src")
         val year = Regex("\\d, (\\d*)").find(
@@ -153,7 +156,7 @@ class KuronimeProvider : MainAPI() {
             Episode(link, episode = episode)
         }.reversed()
 
-        val tracker = APIHolder.getTracker(listOf(title),TrackerType.getTypes(type),year,true)
+        val tracker = APIHolder.getTracker(listOf(title), TrackerType.getTypes(type), year, true)
 
         return newAnimeLoadResponse(title, url, type) {
             engName = title
@@ -211,7 +214,9 @@ class KuronimeProvider : MainAPI() {
                     "AES/CBC/NoPadding"
                 )
                 tryParseJson<Mirrors>(decrypt)?.embed?.map { embed ->
+                    println("Embed ${embed}")
                     embed.value.apmap {
+                        println("Value ${it.value}")
                         loadFixedExtractor(
                             it.value,
                             embed.key.removePrefix("v"),
