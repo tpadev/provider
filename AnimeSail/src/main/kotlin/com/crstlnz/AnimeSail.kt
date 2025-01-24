@@ -9,16 +9,21 @@ import com.crstlnz.utils.getLastNumber
 import com.crstlnz.utils.splitTitles
 import com.crstlnz.utils.toAbsoluteURL
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.lagradost.cloudstream3.APIHolder
 import com.lagradost.cloudstream3.AnimeLoadResponse
 import com.lagradost.cloudstream3.DubStatus
 import com.lagradost.cloudstream3.Episode
 import com.lagradost.cloudstream3.ErrorLoadingException
 import com.lagradost.cloudstream3.HomePageResponse
+import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
+import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
+import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.ShowStatus
 import com.lagradost.cloudstream3.SubtitleFile
+import com.lagradost.cloudstream3.TrackerType
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.addEpisodes
 import com.lagradost.cloudstream3.addSub
@@ -156,8 +161,7 @@ class AnimeSail : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse> {
         return app.get(
-            "$mainUrl/category/anime?s=$query",
-            referer = "$mainUrl/search/?keyword=$query",
+            "$mainUrl/?s=$query",
             headers = mapOf("X-Requested-With" to "XMLHttpRequest")
         ).document.toSearchResponses() ?: throw ErrorLoadingException("Invalid reponse")
 
@@ -170,7 +174,6 @@ class AnimeSail : MainAPI() {
         val title = document.getTableContent("Alternatif:")?.splitTitles()?.first
         val poster = document.selectFirst(".entry-content img")?.attr("src")?.toSmallerImage()
         val tags = document.getTableContent("Genre:")?.split(",")?.map { it.trim() }
-        val type = document.getTableContent("Tipe:")
 
         val status = getStatus(document.getTableContent("Status:"))
         val description = document.selectFirst(".entry-content")?.getElementsBefore("h2")?.text()
@@ -187,16 +190,29 @@ class AnimeSail : MainAPI() {
             }
         }
         episodes.addAll(eps.filterNotNull())
+        val type = getTvType(document.getTableContent("Tipe:"))
+        val year = document.getTableContent("Dirilis:")?.trim()?.toIntOrNull()
+        val tracker =
+            APIHolder.getTracker(
+                listOf(title ?: jTitle, jTitle),
+                TrackerType.getTypes(type),
+                year,
+                true
+            )
 
-        return newAnimeLoadResponse(jTitle, url, getTvType(type)) {
+
+        return newAnimeLoadResponse(jTitle, url, type) {
             engName = title
             japName = jTitle
+            backgroundPosterUrl = tracker?.cover
             posterUrl = poster
-//            this.year = year
+            this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
             showStatus = status
             plot = description
             this.tags = tags
+            addMalId(tracker?.malId)
+            addAniListId(tracker?.aniId?.toIntOrNull())
         }
     }
 
