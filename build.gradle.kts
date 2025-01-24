@@ -110,3 +110,28 @@ dependencies {
     val implementation by configurations
     implementation("com.github.crstlnz.utils:Utils:674037c288")
 }
+
+android {
+    compileSdkVersion(33)
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 33
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_18.toString() // Required
+            // Disables some unnecessary features
+            freeCompilerArgs = freeCompilerArgs +
+                    "-Xno-call-assertions" +
+                    "-Xno-param-assertions" +
+                    "-Xno-receiver-assertions"
+        }
+    }
+}
