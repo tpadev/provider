@@ -1,29 +1,30 @@
 package com.crstlnz.utils
 
-import com.lagradost.cloudstream3.SubtitleFile
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.ExtractorLinkType
-import com.lagradost.cloudstream3.utils.getQualityFromName
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
 
-suspend fun loadAnimeSail(
-    url: String,
-    name: String,
-    referer: String? = null,
-    subtitleCallback: (SubtitleFile) -> Unit,
-    callback: (ExtractorLink) -> Unit
-): Boolean {
-    val document = app.get(url).document
-    val src = document.selectFirst("video source")?.attr("src") ?: return false
-    callback(
-        ExtractorLink(
-            name,
-            name,
-            src,
-            referer ?: url,
-            getQualityFromName(name),
-            ExtractorLinkType.M3U8,
+
+open class AnimeSailEmbed() : ExtractorApi() {
+    override val mainUrl: String = "https://pixeldrain.com"
+    override val name: String = "AnimeSailEmbed"
+    override val requiresReferer: Boolean = true
+
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ) {
+        val document = app.get(url).document
+        val src = document.selectFirst("video source")?.attr("src") ?: return
+        callback.invoke(
+            ExtractorLink(
+                name,
+                name,
+                src,
+                referer ?: url,
+                Qualities.Unknown.value
+            )
         )
-    )
-    return true
+    }
 }

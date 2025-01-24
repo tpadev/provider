@@ -4,8 +4,8 @@ package com.crstlnz
 //import com.crstlnz.utils.loadAnimeSail
 //import com.crstlnz.utils.splitTitles
 //import com.crstlnz.utils.toAbsoluteURL
+import com.crstlnz.utils.AnimeSailEmbed
 import com.crstlnz.utils.getLastNumber
-import com.crstlnz.utils.loadAnimeSail
 import com.crstlnz.utils.splitTitles
 import com.crstlnz.utils.toAbsoluteURL
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -28,6 +28,7 @@ import com.lagradost.cloudstream3.newAnimeLoadResponse
 import com.lagradost.cloudstream3.newAnimeSearchResponse
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -232,15 +233,60 @@ class AnimeSail : MainAPI() {
             val iframe = String(Base64.decode(linkEl.attr("data-em").toByteArray()))
             val link = Jsoup.parse(iframe).selectFirst("iframe")?.attr("src") ?: ""
             val name = linkEl.text()
-            println("Link : $link")
-            if (link.contains("154.26.137.28")) {
-                loadAnimeSail(link, name, subtitleCallback = subtitleCallback, callback = callback)
-            } else {
-                loadExtractor(
-                    link,
-                    mainUrl,
-                    subtitleCallback,
-                    callback
+            customLoadExtractor(
+                name,
+                link,
+                null,
+                subtitleCallback,
+                callback
+            )
+        }
+        return true
+    }
+
+    private suspend fun customLoadExtractor(
+        name: String,
+        url: String,
+        referer: String? = null,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        if (url.contains("154.26.137.28")) {
+            AnimeSailEmbed().getUrl(
+                url,
+                name,
+                subtitleCallback = subtitleCallback,
+            ) { link ->
+                callback.invoke(
+                    ExtractorLink(
+                        name,
+                        link.name,
+                        link.url,
+                        link.referer,
+                        getQualityFromName(name),
+                        link.type,
+                        link.headers,
+                        link.extractorData
+                    )
+                )
+            }
+        } else {
+            loadExtractor(
+                url,
+                referer,
+                subtitleCallback
+            ) { link ->
+                callback.invoke(
+                    ExtractorLink(
+                        name,
+                        link.name,
+                        link.url,
+                        link.referer,
+                        getQualityFromName(name),
+                        link.type,
+                        link.headers,
+                        link.extractorData
+                    )
                 )
             }
         }
