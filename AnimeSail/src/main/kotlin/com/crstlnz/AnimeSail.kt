@@ -252,6 +252,7 @@ class AnimeSail : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         if (url.contains("154.26.137.28")) {
+            println("URL : $url")
             AnimeSailEmbed().getUrl(
                 url,
                 name,
@@ -259,8 +260,8 @@ class AnimeSail : MainAPI() {
             ) { link ->
                 callback.invoke(
                     ExtractorLink(
-                        name,
                         link.name,
+                        name,
                         link.url,
                         link.referer,
                         getQualityFromName(name),
@@ -278,8 +279,8 @@ class AnimeSail : MainAPI() {
             ) { link ->
                 callback.invoke(
                     ExtractorLink(
-                        name,
                         link.name,
+                        name,
                         link.url,
                         link.referer,
                         getQualityFromName(name),
