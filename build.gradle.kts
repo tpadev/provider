@@ -112,6 +112,7 @@ dependencies {
 }
 
 android {
+    namespace = "com.crstlnz"
     compileSdkVersion(33)
 
     defaultConfig {
