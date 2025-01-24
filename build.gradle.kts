@@ -1,9 +1,7 @@
 import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import com.android.build.gradle.BaseExtension
 
-apply(plugin = "com.android.library")
-apply(plugin = "kotlin-android")
-apply(plugin = "com.lagradost.cloudstream3.gradle")
+
 buildscript {
     repositories {
         google()
@@ -45,12 +43,6 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/crsltnz/provider")
 
         authors = listOf("Crstlnz")
-
-
-        dependencies {
-            val implementation by configurations
-            implementation("com.github.crstlnz.utils:Utils:674037c288")
-        }
     }
 
     android {
@@ -102,37 +94,5 @@ subprojects {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
         implementation("org.mozilla:rhino:1.7.14")
-        implementation("com.github.crstlnz.utils:Utils:674037c288")
-    }
-}
-
-dependencies {
-    val implementation by configurations
-    implementation("com.github.crstlnz.utils:Utils:674037c288")
-}
-
-android {
-    namespace = "com.crstlnz"
-    compileSdkVersion(33)
-
-    defaultConfig {
-        minSdk = 21
-        targetSdk = 33
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_18
-        targetCompatibility = JavaVersion.VERSION_18
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_18.toString() // Required
-            // Disables some unnecessary features
-            freeCompilerArgs = freeCompilerArgs +
-                    "-Xno-call-assertions" +
-                    "-Xno-param-assertions" +
-                    "-Xno-receiver-assertions"
-        }
     }
 }
