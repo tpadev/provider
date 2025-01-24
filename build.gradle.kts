@@ -1,8 +1,9 @@
 import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import com.android.build.gradle.BaseExtension
 
+apply(plugin = "com.android.library")
+apply(plugin = "kotlin-android")
 apply(plugin = "com.lagradost.cloudstream3.gradle")
-
 buildscript {
     repositories {
         google()
@@ -44,6 +45,12 @@ subprojects {
         setRepo(System.getenv("GITHUB_REPOSITORY") ?: "https://github.com/crsltnz/provider")
 
         authors = listOf("Crstlnz")
+
+
+        dependencies {
+            val implementation by configurations
+            implementation("com.github.crstlnz.utils:Utils:674037c288")
+        }
     }
 
     android {
@@ -72,8 +79,9 @@ subprojects {
     }
 
     dependencies {
-        val implementation by configurations
         val apk by configurations
+        val implementation by configurations
+
         apk("com.lagradost:cloudstream3:pre-release")
 
         val apkTasks = listOf("deployWithAdb", "build")
@@ -96,4 +104,9 @@ subprojects {
         implementation("org.mozilla:rhino:1.7.14")
         implementation("com.github.crstlnz.utils:Utils:674037c288")
     }
+}
+
+dependencies {
+    val implementation by configurations
+    implementation("com.github.crstlnz.utils:Utils:674037c288")
 }
