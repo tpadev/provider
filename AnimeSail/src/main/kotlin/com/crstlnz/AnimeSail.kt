@@ -16,6 +16,7 @@ import com.lagradost.cloudstream3.Episode
 import com.lagradost.cloudstream3.ErrorLoadingException
 import com.lagradost.cloudstream3.HomePageResponse
 import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
+import com.lagradost.cloudstream3.LoadResponse.Companion.addDuration
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.MainAPI
@@ -190,22 +191,22 @@ class AnimeSail : MainAPI() {
             }
         }
         episodes.addAll(eps.filterNotNull())
+        episodes.sortBy { it.episode }
         val type = getTvType(document.getTableContent("Tipe:"))
         val year = document.getTableContent("Dirilis:")?.trim()?.toIntOrNull()
         val tracker =
             APIHolder.getTracker(
-                listOf(title ?: jTitle, jTitle),
+                listOf(jTitle),
                 TrackerType.getTypes(type),
                 year,
                 true
             )
 
-
         return newAnimeLoadResponse(jTitle, url, type) {
             engName = title
             japName = jTitle
             backgroundPosterUrl = tracker?.cover
-            posterUrl = poster
+            posterUrl = tracker?.image ?: poster
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
             showStatus = status
@@ -240,7 +241,6 @@ class AnimeSail : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        println("Load url $data")
         val document = app.get(data).document
         val links = document.select(".mobius select option")
 
@@ -268,7 +268,6 @@ class AnimeSail : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         if (url.contains("154.26.137.28")) {
-            println("URL : $url")
             AnimeSailEmbed().getUrl(
                 url,
                 name,
