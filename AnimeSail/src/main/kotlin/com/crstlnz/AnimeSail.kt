@@ -267,6 +267,7 @@ class AnimeSail : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
+        if (url.contains("dood")) return true
         if (url.contains("154.26.137.28")) {
             AnimeSailEmbed().getUrl(
                 url,
@@ -275,7 +276,7 @@ class AnimeSail : MainAPI() {
             ) { link ->
                 callback.invoke(
                     ExtractorLink(
-                        link.name,
+                        AnimeSailEmbed.getSource(link.name) ?: link.name,
                         name,
                         link.url,
                         link.referer,
