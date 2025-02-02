@@ -5,11 +5,6 @@ android {
     namespace = "Anoboy"
 }
 
-dependencies {
-    implementation("com.github.crstlnz.utils:Utils:674037c288")
-}
-
-
 cloudstream {
     language = "id"
     // All of these properties are optional, you can safely remove them
