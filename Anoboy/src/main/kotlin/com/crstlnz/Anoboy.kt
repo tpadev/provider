@@ -1,7 +1,7 @@
 package com.crstlnz
 
+
 import com.crstlnz.utils.getLastNumber
-import com.crstlnz.utils.isGofile
 import com.crstlnz.utils.toAbsoluteURL
 import com.crstlnz.utils.toEmbedUrl
 import com.fasterxml.jackson.annotation.JsonProperty
