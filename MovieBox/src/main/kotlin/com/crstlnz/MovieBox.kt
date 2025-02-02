@@ -77,7 +77,7 @@ class MovieBox : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "/" to "Anime & Donghua",
+        "/" to "Top",
     )
 
     override suspend fun getMainPage(
@@ -200,7 +200,9 @@ class MovieBox : MainAPI() {
                 name = it?.title ?: "",
                 url = "$mainUrl/movies/${it?.detailPath}?id=${it?.subjectId}&scene=&type=/movie/detail",
                 TvType.Movie
-            )
+            ) {
+                posterUrl = it?.cover?.url
+            }
         } ?: listOf()
     }
 
@@ -319,7 +321,12 @@ class MovieBox : MainAPI() {
                 app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
                     .parsed<CaptionData>()
             for (caption in subtitleData.data?.captions ?: listOf()) {
-                subtitleCallback(SubtitleFile(lang = caption?.lan ?: "", url = (caption?.url ?: "").ensureHttp()))
+                subtitleCallback(
+                    SubtitleFile(
+                        lang = caption?.lan ?: "",
+                        url = (caption?.url ?: "").ensureHttp()
+                    )
+                )
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -334,7 +341,7 @@ class MovieBox : MainAPI() {
     }
 
     fun String.getStreamType(): ExtractorLinkType {
-        if (this === "MP4") return ExtractorLinkType.VIDEO
+        if (this == "MP4") return ExtractorLinkType.VIDEO
         return ExtractorLinkType.M3U8
     }
 
