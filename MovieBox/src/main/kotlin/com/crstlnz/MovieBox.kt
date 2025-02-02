@@ -8,6 +8,7 @@ import com.crstlnz.models.CaptionData
 import com.crstlnz.models.DetailMovie
 import com.crstlnz.models.EpisodeData
 import com.crstlnz.models.HomeData
+import com.crstlnz.models.HomeSearch
 import com.crstlnz.models.SearchAPI
 import com.crstlnz.utils.AnimeSailEmbed
 import com.crstlnz.utils.getLastNumber
@@ -34,6 +35,7 @@ import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TrackerType
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.addEpisodes
+import com.lagradost.cloudstream3.addPoster
 import com.lagradost.cloudstream3.addSeasonNames
 import com.lagradost.cloudstream3.addSub
 import com.lagradost.cloudstream3.app
@@ -77,15 +79,45 @@ class MovieBox : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "/" to "Top",
+        "872031290915189720" to "Top 20",
+        "6528093688173053896" to "Newly Added Indonesian Movies",
+        "5283462032510044280" to "Favorite Sinetron",
+        "movie_hottest" to "Top Movies",
+        "animation_hottest" to "Top Anime",
     )
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val home = app.get(mainUrl).document.toHomeSearchResponse()
-        return newHomePageResponse(request.name, home)
+        val res = app.post(
+            "$mainUrl/wefeed-h5-bff/web/ranking-list/content",
+            data = mapOf(
+                "id" to request.data,
+                "page" to page.toString(),
+                "perPage" to "30"
+            ),
+            headers = mapOf(
+                "X-Requested-With" to "XMLHttpRequest",
+                "content-type" to "application/json",
+                "origin" to "https://moviebox.ng",
+                "referer" to "https://moviebox.ng",
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+                "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}"
+            )
+        )
+
+        println(res.text)
+        val data = res.parsed<HomeSearch>()
+        return newHomePageResponse(request.name, data.data?.subjectList?.map {
+            newMovieSearchResponse(
+                name = it?.title ?: "",
+                url = "$mainUrl/movies/${it?.detailPath}?id=${it?.subjectId}&scene=&type=/movie/detail",
+                TvType.Movie
+            ) {
+                posterUrl = it?.cover?.url
+            }
+        } ?: listOf())
     }
 
     private fun Document.toHomeSearchResponse(): List<SearchResponse> {
@@ -222,7 +254,6 @@ class MovieBox : MainAPI() {
 
         val episodes = mutableListOf<Episode>()
         val seasons = mutableListOf<SeasonData>()
-        println("APAKAH MOVIE ${isMovie}")
         if (isMovie) {
             episodes.add(
                 Episode(
@@ -256,11 +287,11 @@ class MovieBox : MainAPI() {
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
             addSeasonNames(seasons)
-//            showStatus = status
             plot = data.subject?.description
-//            this.tags = tags
-//            addMalId(tracker?.malId)
-//            addAniListId(tracker?.aniId?.toIntOrNull())
+            println(data.subject?.genre?.split(",")?.map { it.trim() })
+            tags = data.subject?.genre?.split(",")?.map { it.trim() }
+            addMalId(tracker?.malId)
+            addAniListId(tracker?.aniId?.toIntOrNull())
         }
     }
 
@@ -307,8 +338,8 @@ class MovieBox : MainAPI() {
         for (stream in episodeData.data?.streams ?: listOf()) {
             callback(
                 ExtractorLink(
-                    source = "MovieBox",
-                    name = stream?.resolutions ?: "",
+                    source = name,
+                    name = name,
                     referer = mainUrl,
                     url = (stream?.url ?: "").ensureHttp(),
                     type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
