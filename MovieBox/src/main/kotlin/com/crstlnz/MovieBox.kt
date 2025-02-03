@@ -282,6 +282,7 @@ class MovieBox : MainAPI() {
             url,
             type
         ) {
+            rating = ((data.subject?.imdbRatingValue?.toFloatOrNull() ?: (0f * 10f))).toInt()
             backgroundPosterUrl = tracker?.cover
             posterUrl = tracker?.image ?: data.metadata?.image
             this.year = year
@@ -354,7 +355,7 @@ class MovieBox : MainAPI() {
             for (caption in subtitleData.data?.captions ?: listOf()) {
                 subtitleCallback(
                     SubtitleFile(
-                        lang = caption?.lan ?: "",
+                        lang = caption?.lanName ?: caption?.lan ?: "",
                         url = (caption?.url ?: "").ensureHttp()
                     )
                 )
