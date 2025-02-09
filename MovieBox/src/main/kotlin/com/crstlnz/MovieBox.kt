@@ -80,6 +80,7 @@ class MovieBox : MainAPI() {
 
     override val mainPage = mainPageOf(
         "872031290915189720" to "Top 20",
+        "5848753831881965888" to "Horror Indonesia",
         "6528093688173053896" to "Newly Added Indonesian Movies",
         "5283462032510044280" to "Favorite Sinetron",
         "movie_hottest" to "Top Movies",
@@ -353,9 +354,10 @@ class MovieBox : MainAPI() {
                 app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
                     .parsed<CaptionData>()
             for (caption in subtitleData.data?.captions ?: listOf()) {
+                val lang = caption?.lanName ?: caption?.lan ?: ""
                 subtitleCallback(
                     SubtitleFile(
-                        lang = caption?.lanName ?: caption?.lan ?: "",
+                        lang = if (lang.lowercase().trim() === "indonesia") "Indonesian" else lang,
                         url = (caption?.url ?: "").ensureHttp()
                     )
                 )
