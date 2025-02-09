@@ -81,9 +81,11 @@ class MovieBox : MainAPI() {
     override val mainPage = mainPageOf(
         "872031290915189720" to "Top 20",
         "5848753831881965888" to "Horror Indonesia",
-        "6528093688173053896" to "Newly Added Indonesian Movies",
-        "5283462032510044280" to "Favorite Sinetron",
-        "movie_hottest" to "Top Movies",
+        "4380734070238626200" to "Hot K-Drama",
+        "6528093688173053896" to "Film Indonesia Baru",
+        "5283462032510044280" to "Sinetron Favorite\uD83D\uDC97",
+        "movie_hottest" to "Film Paling Top",
+        "997144265920760504" to "Film Populer",
         "animation_hottest" to "Top Anime",
     )
 
@@ -357,7 +359,7 @@ class MovieBox : MainAPI() {
                 val lang = caption?.lanName ?: caption?.lan ?: ""
                 subtitleCallback(
                     SubtitleFile(
-                        lang = if (lang.lowercase().trim() === "indonesia") "Indonesian" else lang,
+                        lang = if (lang.lowercase().trim() == "indonesia") "Indonesian" else lang,
                         url = (caption?.url ?: "").ensureHttp()
                     )
                 )
