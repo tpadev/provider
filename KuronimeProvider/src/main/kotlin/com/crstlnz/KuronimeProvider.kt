@@ -11,21 +11,23 @@ import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.M3u8Helper
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import org.jsoup.nodes.Element
 import java.net.URI
 import java.util.ArrayList
 
 class KuronimeProvider : MainAPI() {
-    override var mainUrl = "https://kuronime.biz/"
+    override var mainUrl = "https://kuronime.biz"
     private var animekuUrl = "https://animeku.org"
     override var name = "Kuronime+"
     override val hasQuickSearch = true
     override val hasMainPage = true
     override var lang = "id"
     override val supportedTypes = setOf(
-        TvType.Anime,
-        TvType.AnimeMovie,
-        TvType.OVA
+        TvType.Anime, TvType.AnimeMovie, TvType.OVA
     )
 
     companion object {
@@ -54,8 +56,7 @@ class KuronimeProvider : MainAPI() {
     )
 
     override suspend fun getMainPage(
-        page: Int,
-        request: MainPageRequest
+        page: Int, request: MainPageRequest
     ): HomePageResponse {
         val req = app.get(request.data + page)
         mainUrl = getBaseUrl(req.url)
@@ -109,15 +110,11 @@ class KuronimeProvider : MainAPI() {
         mainUrl = app.get(mainUrl).url
         return app.post(
             "$mainUrl/wp-admin/admin-ajax.php", data = mapOf(
-                "action" to "ajaxy_sf",
-                "sf_value" to query,
-                "search" to "false"
+                "action" to "ajaxy_sf", "sf_value" to query, "search" to "false"
             ), headers = mapOf("X-Requested-With" to "XMLHttpRequest")
         ).parsedSafe<Search>()?.anime?.firstOrNull()?.all?.mapNotNull {
             newAnimeSearchResponse(
-                it.postTitle ?: "",
-                it.postLink ?: return@mapNotNull null,
-                TvType.Anime
+                it.postTitle ?: "", it.postLink ?: return@mapNotNull null, TvType.Anime
             ) {
                 this.posterUrl = it.postImage
                 addSub(it.postLatest?.toIntOrNull())
@@ -131,12 +128,10 @@ class KuronimeProvider : MainAPI() {
         val title = document.selectFirst(".entry-title")?.text().toString().trim()
         val poster = document.selectFirst("div.l[itemprop=image] > img")?.attr("data-src")
         val tags = document.select(".infodetail > ul > li:nth-child(2) > a").map { it.text() }
-        val type =
-            getType(
-                document.selectFirst(".infodetail > ul > li:nth-child(7)")?.ownText()
-                    ?.removePrefix(":")
-                    ?.lowercase()?.trim() ?: "tv"
-            )
+        val type = getType(
+            document.selectFirst(".infodetail > ul > li:nth-child(7)")?.ownText()?.removePrefix(":")
+                ?.lowercase()?.trim() ?: "tv"
+        )
 
         val trailer = document.selectFirst("div.tply iframe")?.attr("data-src")
         val year = Regex("\\d, (\\d*)").find(
@@ -183,52 +178,54 @@ class KuronimeProvider : MainAPI() {
         val id = document.selectFirst("div#content script:containsData(is_singular)")?.data()
             ?.substringAfter("\"")?.substringBefore("\";")
             ?: throw ErrorLoadingException("No id found")
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val jsonBody = "{\"id\":\"${id}\"}"
+        val body = jsonBody.toRequestBody(mediaType)
         val servers = app.post(
-            "$animekuUrl/v3.1.php", data = mapOf(
-                "id" to id
-            ), referer = "$mainUrl/"
+            "$animekuUrl/api/v9/sources",
+            requestBody = body,
+            referer = "$mainUrl/",
+            headers = mapOf("Content-Type" to "application/json; charset=utf-8")
         ).parsedSafe<Servers>()
 
-        argamap(
-            {
-                val decrypt = AesHelper.cryptoAESHandler(
-                    base64Decode(servers?.src ?: return@argamap),
-                    KEY.toByteArray(),
-                    false,
-                    "AES/CBC/NoPadding"
-                )
-                val source =
-                    tryParseJson<Sources>(decrypt?.toJsonFormat())?.src?.replace("\\", "")
-                M3u8Helper.generateM3u8(
-                    this.name,
-                    source ?: return@argamap,
-                    "$animekuUrl/",
-                    headers = mapOf("Origin" to animekuUrl)
-                ).forEach(callback)
-            },
-            {
-                val decrypt = AesHelper.cryptoAESHandler(
-                    base64Decode(servers?.mirror ?: return@argamap),
-                    KEY.toByteArray(),
-                    false,
-                    "AES/CBC/NoPadding"
-                )
-                tryParseJson<Mirrors>(decrypt)?.embed?.map { embed ->
-                    println("Embed ${embed}")
-                    embed.value.apmap {
-                        println("Value ${it.value}")
-                        loadFixedExtractor(
-                            it.value,
-                            embed.key.removePrefix("v"),
-                            "$mainUrl/",
-                            subtitleCallback,
-                            callback
-                        )
-                    }
-                }
+        println(id)
 
+        argamap({
+            val decrypt = AesHelper.cryptoAESHandler(
+                base64Decode(servers?.src ?: return@argamap),
+                KEY.toByteArray(),
+                false,
+                "AES/CBC/NoPadding"
+            )
+            val source = tryParseJson<Sources>(decrypt?.toJsonFormat())?.src?.replace("\\", "")
+            M3u8Helper.generateM3u8(
+                this.name,
+                source ?: return@argamap,
+                "$animekuUrl/",
+                headers = mapOf("Origin" to animekuUrl)
+            ).forEach(callback)
+        }, {
+            val decrypt = AesHelper.cryptoAESHandler(
+                base64Decode(servers?.mirror ?: return@argamap),
+                KEY.toByteArray(),
+                false,
+                "AES/CBC/NoPadding"
+            )
+            tryParseJson<Mirrors>(decrypt)?.embed?.map { embed ->
+                println("Embed ${embed}")
+                embed.value.apmap {
+                    println("Value ${it.value}")
+                    loadFixedExtractor(
+                        it.value,
+                        embed.key.removePrefix("v"),
+                        "$mainUrl/",
+                        subtitleCallback,
+                        callback
+                    )
+                }
             }
-        )
+
+        })
 
         return true
     }
