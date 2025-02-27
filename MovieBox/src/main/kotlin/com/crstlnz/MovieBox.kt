@@ -80,6 +80,7 @@ class MovieBox : MainAPI() {
 
     override val mainPage = mainPageOf(
         "872031290915189720" to "Top 20",
+        "6001471894749331600" to "Ramadhan",
         "5848753831881965888" to "Horror Indonesia",
         "4380734070238626200" to "Hot K-Drama",
         "6528093688173053896" to "Film Indonesia Baru",
@@ -147,7 +148,7 @@ class MovieBox : MainAPI() {
     }
 
     private fun JsonNode.extractNuxtData(): JsonNode {
-        return get(7).getData(this)
+        return get(8).getData(this)
     }
 
     private fun JsonNode.getData(dataNuxt: JsonNode): JsonNode {

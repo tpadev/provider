@@ -276,7 +276,10 @@ data class MoviePubParam(
 	val uid: String? = null,
 
 	@field:JsonProperty("url")
-	val url: String? = null
+	val url: String? = null,
+
+	@field:JsonProperty("lang")
+	val lang: String? = null
 )
 
 data class SeasonsItem(
