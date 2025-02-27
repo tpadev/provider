@@ -9,7 +9,7 @@ suspend fun main() {
 //    providerTester.testLoadLinks("https://moviebox.ng/wefeed-h5-bff/web/subject/play?subjectId=5589585095314260816&se=1&ep=2")
 
 //    providerTester.testAll()
-//    providerTester.testSearch("demon slayer")
+    providerTester.testSearch("moving")
 //    providerTester.testLoad("https://tv4.dramaserial.id/film-seri/nonton-hook-bait-2025-sub-indo-2/")
-    providerTester.testLoadLinks("https://tv4.dramaserial.id/film-seri/nonton-hook-bait-2025-sub-indo-2/")
+//    providerTester.testLoadLinks("https://tv4.dramaserial.id/film-seri/nonton-hook-bait-2025-sub-indo-2/")
 }

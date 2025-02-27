@@ -94,9 +94,12 @@ class DramaSerial : MainAPI() {
             "$mainUrl/${request.data}/page/${page}",
         ).document
 
+        return newHomePageResponse(request.name, document.toSearchResponse() ?: listOf())
+    }
 
-        val list = document.select("#main article")
-        return newHomePageResponse(request.name, list.map {
+    private fun Document.toSearchResponse(): List<SearchResponse> {
+        val list = select("#main article")
+        return list.map {
             newMovieSearchResponse(
                 name = it.select(".entry-title").text().replace("Nonton", "")
                     .replace("Sub Indo", "").trim(),
@@ -105,23 +108,7 @@ class DramaSerial : MainAPI() {
             ) {
                 posterUrl = it.select(".content-thumbnail img").attr("src")
             }
-        } ?: listOf())
-    }
-
-    private fun Document.toHomeSearchResponse(): List<SearchResponse> {
-        val nuxtDataJson = selectFirst("#__NUXT_DATA__")?.html()
-        val objectMapper = ObjectMapper()
-        val nuxtData = objectMapper.readTree(nuxtDataJson);
-        val data = objectMapper.convertValue(nuxtData.extractNuxtData(), HomeData::class.java)
-        return data.banner?.items?.map {
-            newMovieSearchResponse(
-                name = it?.title ?: "",
-                url = it?.url?.ensureHttp() ?: "",
-                type = TvType.Movie
-            ) {
-                posterUrl = it?.image?.url
-            }
-        } ?: listOf()
+        }
     }
 
     private fun Document.toDetailMovie(): DetailMovie {
@@ -199,31 +186,8 @@ class DramaSerial : MainAPI() {
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
     override suspend fun search(query: String): List<SearchResponse> {
-        val data = app.post(
-            "$mainUrl/wefeed-h5-bff/web/subject/search",
-            data = mapOf(
-                "keyword" to query,
-                "page" to "1",
-                "perPage" to "30"
-            ),
-            headers = mapOf(
-                "X-Requested-With" to "XMLHttpRequest",
-                "content-type" to "application/json",
-                "origin" to "https://moviebox.ng",
-                "referer" to "https://moviebox.ng",
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
-                "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}"
-            )
-        ).parsed<SearchAPI>()
-        return data.data?.items?.map {
-            newMovieSearchResponse(
-                name = it?.title ?: "",
-                url = "$mainUrl/movies/${it?.detailPath}?id=${it?.subjectId}&scene=&type=/movie/detail",
-                TvType.Movie
-            ) {
-                posterUrl = it?.cover?.url
-            }
-        } ?: listOf()
+        val document = app.get("$mainUrl/?s=${query}&post_type%5B%5D=post&post_type%5B%5D=tv").document
+        return document.toSearchResponse()
     }
 
     override suspend fun load(url: String): AnimeLoadResponse {
