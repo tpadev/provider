@@ -148,7 +148,7 @@ class MovieBox : MainAPI() {
     }
 
     private fun JsonNode.extractNuxtData(): JsonNode {
-        return get(8).getData(this)
+        return get(5).getData(this).get("\$sresData")
     }
 
     private fun JsonNode.getData(dataNuxt: JsonNode): JsonNode {
