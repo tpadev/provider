@@ -4,9 +4,9 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 
 
-open class AnimeSailEmbed() : ExtractorApi() {
-    override val mainUrl: String = "https://pixeldrain.com"
-    override val name: String = "AnimeSailEmbed"
+open class ArmoBiz() : ExtractorApi() {
+    override val mainUrl: String = "https://www.armob.biz.id"
+    override val name: String = "ArmoBiz"
     override val requiresReferer: Boolean = true
 
     companion object {
@@ -28,7 +28,7 @@ open class AnimeSailEmbed() : ExtractorApi() {
                 return "pomf2"
             } else if (str.contains("kraken")) {
                 return "Krakenfiles"
-            } else if (str.contains("kowo")) {
+            } else if (str.contains("kowo")){
                 return "Qiwi"
             }
 
@@ -43,6 +43,7 @@ open class AnimeSailEmbed() : ExtractorApi() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ) {
+        println("armo biz extract")
         val document = app.get(url).document
         val listLink = document.select("div.d-grid.gap-2 a")
 
@@ -59,6 +60,5 @@ open class AnimeSailEmbed() : ExtractorApi() {
                 )
             )
         }
-
     }
 }

@@ -10,7 +10,7 @@ import com.crstlnz.models.EpisodeData
 import com.crstlnz.models.HomeData
 import com.crstlnz.models.HomeSearch
 import com.crstlnz.models.SearchAPI
-import com.crstlnz.utils.AnimeSailEmbed
+import com.crstlnz.utils.ArmoBiz
 import com.crstlnz.utils.getLastNumber
 import com.crstlnz.utils.splitTitles
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -58,9 +58,9 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 
-class MovieBox : MainAPI() {
-    override var mainUrl = "https://moviebox.ng"
-    override var name = "MovieBox"
+class DramaSerial : MainAPI() {
+    override var mainUrl = "https://tv4.dramaserial.id"
+    override var name = "DramaSerial"
     override val hasMainPage = true
     override var lang = "id"
     override val hasQuickSearch = true
@@ -71,7 +71,8 @@ class MovieBox : MainAPI() {
         TvType.AnimeMovie,
         TvType.Movie,
         TvType.OVA,
-        TvType.TvSeries
+        TvType.TvSeries,
+        TvType.AsianDrama
     )
 
     init {
@@ -81,47 +82,28 @@ class MovieBox : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "872031290915189720" to "Top 20",
-        "6001471894749331600" to "Ramadhan",
-        "5848753831881965888" to "Horror Indonesia",
-        "4380734070238626200" to "Hot K-Drama",
-        "6528093688173053896" to "Film Indonesia Baru",
-        "5283462032510044280" to "Sinetron Favorite\uD83D\uDC97",
-        "movie_hottest" to "Film Paling Top",
-        "997144265920760504" to "Film Populer",
-        "animation_hottest" to "Top Anime",
+        "/Genre/ongoing" to "Sedang Tayang",
+        "/Genre/drama-serial-korea" to "Drama Serial Korea",
     )
 
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest
     ): HomePageResponse {
-        val res = app.post(
-            "$mainUrl/wefeed-h5-bff/web/ranking-list/content",
-            data = mapOf(
-                "id" to request.data,
-                "page" to page.toString(),
-                "perPage" to "30"
-            ),
-            headers = mapOf(
-                "X-Requested-With" to "XMLHttpRequest",
-                "content-type" to "application/json",
-                "origin" to "https://moviebox.ng",
-                "referer" to "https://moviebox.ng",
-                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
-                "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}"
-            )
-        )
+        val document = app.post(
+            "$mainUrl/${request.data}/page/${page}",
+        ).document
 
-        println(res.text)
-        val data = res.parsed<HomeSearch>()
-        return newHomePageResponse(request.name, data.data?.subjectList?.map {
+
+        val list = document.select("#main article")
+        return newHomePageResponse(request.name, list.map {
             newMovieSearchResponse(
-                name = it?.title ?: "",
-                url = "$mainUrl/movies/${it?.detailPath}?id=${it?.subjectId}&scene=&type=/movie/detail",
-                TvType.Movie
+                name = it.select(".entry-title").text().replace("Nonton", "")
+                    .replace("Sub Indo", "").trim(),
+                url = it.select(".entry-title a").attr("href"),
+                TvType.AsianDrama
             ) {
-                posterUrl = it?.cover?.url
+                posterUrl = it.select(".content-thumbnail img").attr("src")
             }
         } ?: listOf())
     }
@@ -245,62 +227,47 @@ class MovieBox : MainAPI() {
     }
 
     override suspend fun load(url: String): AnimeLoadResponse {
-        val data = app.get(url).document.toDetailMovie()
-        val isMovie =
-            data.resource?.seasons == null || data.resource.seasons.find { it?.maxEp == 0 || it?.se == 0 } != null
-        val type = getTvType(data.subject?.genre, isMovie)
-        print("Typenya : ")
-        println(type)
-        val year = data.subject?.releaseDate?.getYear()
-        val tracker = if (data.subject?.countryName === "Japan")
-            APIHolder.getTracker(
-                listOf(data.subject?.title ?: ""),
-                TrackerType.getTypes(type),
-                year,
-                true
-            ) else null
+        val data = app.get(url).document
+
+        val type = if (data.selectFirst(".page-links") != null) TvType.TvSeries else TvType.Movie
+        val year = data.select(".gmr-movie-innermeta")[1].select(".gmr-movie-genre a").text().trim()
+            .toInt()
+
 
         val episodes = mutableListOf<Episode>()
         val seasons = mutableListOf<SeasonData>()
-        if (isMovie) {
+        episodes.add(
+            Episode(
+                url,
+                episode = 1
+            )
+        )
+
+        val episodesEl = data.select(".page-links a")
+        for (episode in episodesEl) {
             episodes.add(
                 Episode(
-                    "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0",
-                    episode = 1,
-                    name = data.subject?.title
+                    episode.attr("href"),
+                    episode = episode.select(".page-link-number").text().toInt()
                 )
             )
-        } else {
-            for (season in data.resource?.seasons ?: listOf()) {
-                for (ep in 1..(season?.maxEp ?: 0)) {
-                    seasons.add(SeasonData(season?.se ?: 0, "Season ${season?.se}"))
-                    episodes.add(
-                        Episode(
-                            "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}",
-                            episode = ep,
-                            season = season?.se
-                        )
-                    )
-                }
-            }
         }
-
+        val img = (data.selectFirst(".gmr-movie-data img")?.attr("src") ?: "").replace("-60x90", "")
         return newAnimeLoadResponse(
-            data.subject?.title ?: "",
+            data.selectFirst(".entry-title")?.text()?.replace("Nonton", "")?.replace("Sub Indo", "")
+                ?.trim() ?: "",
             url,
             type
         ) {
-            rating = ((data.subject?.imdbRatingValue?.toFloatOrNull() ?: (0f * 10f))).toInt()
-            backgroundPosterUrl = tracker?.cover
-            posterUrl = tracker?.image ?: data.metadata?.image
+            rating =
+                data.selectFirst(".gmr-rating-content [itemprop='ratingValue']")?.text()?.trim()
+                    ?.replace(",", ".")?.toFloat()?.toInt()
+            backgroundPosterUrl = img
+            posterUrl = img
             this.year = year
             addEpisodes(DubStatus.Subbed, episodes)
-            addSeasonNames(seasons)
-            plot = data.subject?.description
-            println(data.subject?.genre?.split(",")?.map { it.trim() })
-            tags = data.subject?.genre?.split(",")?.map { it.trim() }
-            addMalId(tracker?.malId)
-            addAniListId(tracker?.aniId?.toIntOrNull())
+            plot = ""
+            tags = data.select(".gmr-movie-genre a").map { it.text() }
         }
     }
 
@@ -343,35 +310,29 @@ class MovieBox : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        print(data)
-        val episodeData = app.get(data).parsed<EpisodeData>()
-        for (stream in episodeData.data?.streams ?: listOf()) {
-            callback(
-                ExtractorLink(
-                    source = name,
-                    name = name,
-                    referer = mainUrl,
-                    url = (stream?.url ?: "").ensureHttp(),
-                    type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
-                    quality = getQualityFromName(stream?.resolutions ?: "")
-                )
-            )
-        }
-        try {
-            val subtitleData =
-                app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
-                    .parsed<CaptionData>()
-            for (caption in subtitleData.data?.captions ?: listOf()) {
-                val lang = caption?.lanName ?: caption?.lan ?: ""
-                subtitleCallback(
-                    SubtitleFile(
-                        lang = if (lang.lowercase().trim() == "indonesia") "Indonesian" else lang,
-                        url = (caption?.url ?: "").ensureHttp()
+        val doc = app.get(data).document
+        val juraganLink = doc.selectFirst(".pull-right a.tombol")?.attr("href") ?: return false
+
+        val document = app.get(juraganLink, referer = data).document
+        val dlLinks = document.select(".main-menu-container li a").map { it.attr("href") }
+        for (link in dlLinks) {
+            if (link !== juraganLink) {
+                if (link.contains("armob.biz.id")) {
+                    ArmoBiz().getUrl(
+                        link.replace("\n", ""),
+                        mainUrl,
+                        subtitleCallback,
+                        callback
                     )
-                )
+                } else {
+                    loadExtractor(
+                        link,
+                        mainUrl,
+                        subtitleCallback,
+                        callback
+                    )
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
         return true
     }

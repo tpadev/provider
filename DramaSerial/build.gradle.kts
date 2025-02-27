@@ -1,8 +1,8 @@
 // use an integer for version numbers
-version = 9
+version = 1
 
 android {
-    namespace = "MovieBox"
+    namespace = "DramaSerial"
 }
 
 cloudstream {
@@ -30,5 +30,5 @@ cloudstream {
     )
 
     iconUrl =
-        "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://moviebox.ng/&size=64"
+        "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tv4.dramaserial.id/&size=64"
 }
