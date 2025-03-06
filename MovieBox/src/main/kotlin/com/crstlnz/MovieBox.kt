@@ -343,9 +343,17 @@ class MovieBox : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        print(data)
-        val episodeData = app.get(data).parsed<EpisodeData>()
+        val episodeData = app.get(data, headers = mapOf(
+            "X-Requested-With" to "XMLHttpRequest",
+            "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
+            "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+            "Cookie" to "account=6477308143197455184|0|H5||; uuid=dfd88a29-2ade-4634-9f1e-9b8ea1bb3122; i18n_lang=en; acw_tc=b3db8710-4164-420b-94ba-5f90b33d334fd5cd3cbde0dd64ef68dce9810f3d6fc8"
+        )).parsed<EpisodeData>()
+
         for (stream in episodeData.data?.streams ?: listOf()) {
+            println("Cloudstream - URL    : ${stream?.url}")
+            println("Cloudstream - Format :${stream?.format}")
+            println("Cloudstream - Codec  : ${stream?.codecName}")
             callback(
                 ExtractorLink(
                     source = name,
