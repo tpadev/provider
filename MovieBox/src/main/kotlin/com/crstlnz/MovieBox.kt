@@ -360,8 +360,8 @@ class MovieBox : MainAPI() {
                     name = name,
                     referer = mainUrl,
                     url = (stream?.url ?: "").ensureHttp(),
-                    type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
-                    quality = getQualityFromName(stream?.resolutions ?: "")
+                    type = ExtractorLinkType.M3U8,
+                    quality = getQualityFromName(stream?.resolutions ?: ""),
                 )
             )
         }
