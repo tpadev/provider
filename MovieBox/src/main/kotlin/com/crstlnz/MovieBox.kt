@@ -351,16 +351,13 @@ class MovieBox : MainAPI() {
         )).parsed<EpisodeData>()
 
         for (stream in episodeData.data?.streams ?: listOf()) {
-            println("Cloudstream - URL    : ${stream?.url}")
-            println("Cloudstream - Format :${stream?.format}")
-            println("Cloudstream - Codec  : ${stream?.codecName}")
             callback(
                 ExtractorLink(
                     source = name,
                     name = name,
                     referer = mainUrl,
                     url = (stream?.url ?: "").ensureHttp(),
-                    type = ExtractorLinkType.M3U8,
+                    type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
                     quality = getQualityFromName(stream?.resolutions ?: ""),
                 )
             )
