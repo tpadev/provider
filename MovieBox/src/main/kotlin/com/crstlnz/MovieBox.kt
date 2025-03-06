@@ -383,8 +383,9 @@ class MovieBox : MainAPI() {
     }
 
     fun String.getStreamType(): ExtractorLinkType {
-        if (this == "MP4") return ExtractorLinkType.VIDEO
-        return ExtractorLinkType.M3U8
+//        if (this == "MP4") return ExtractorLinkType.VIDEO
+//        return ExtractorLinkType.M3U8
+        return ExtractorLinkType.VIDEO
     }
 
 //    private suspend fun customLoadExtractor(
