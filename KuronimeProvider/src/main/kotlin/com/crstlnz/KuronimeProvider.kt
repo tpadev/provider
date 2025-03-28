@@ -6,11 +6,14 @@ import com.lagradost.cloudstream3.LoadResponse.Companion.addAniListId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.LoadResponse.Companion.addTrailer
 import com.lagradost.cloudstream3.extractors.helper.AesHelper
+import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.M3u8Helper
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -168,6 +171,19 @@ class KuronimeProvider : MainAPI() {
         }
     }
 
+    fun extractEncodedString(input: String): String? {
+        // Pattern to match variable declaration with Base64-like string
+        // Looking for: var [any_name] = "[base64_string]";
+        val pattern = Regex("""var\s+\w+\s*=\s*"([A-Za-z0-9+/=]{100,})";""")
+        return try {
+            val match = pattern.find(input)
+            match?.groups?.get(1)?.value
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -175,8 +191,8 @@ class KuronimeProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         val document = app.get(data).document
-        val id = document.selectFirst("div#content script:containsData(is_singular)")?.data()
-            ?.substringAfter("\"")?.substringBefore("\";")
+        val scriptData = document.selectFirst("div#content script:containsData(is_singular)")?.data() ?: ""
+        val id = extractEncodedString(scriptData)
             ?: throw ErrorLoadingException("No id found")
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val jsonBody = "{\"id\":\"${id}\"}"
@@ -187,12 +203,9 @@ class KuronimeProvider : MainAPI() {
             referer = "$mainUrl/",
             headers = mapOf("Content-Type" to "application/json; charset=utf-8")
         ).parsedSafe<Servers>()
-
-        println(id)
-
-        argamap({
+        argamaps({
             val decrypt = AesHelper.cryptoAESHandler(
-                base64Decode(servers?.src ?: return@argamap),
+                base64Decode(servers?.src ?: return@argamaps),
                 KEY.toByteArray(),
                 false,
                 "AES/CBC/NoPadding"
@@ -200,21 +213,19 @@ class KuronimeProvider : MainAPI() {
             val source = tryParseJson<Sources>(decrypt?.toJsonFormat())?.src?.replace("\\", "")
             M3u8Helper.generateM3u8(
                 this.name,
-                source ?: return@argamap,
+                source ?: return@argamaps,
                 "$animekuUrl/",
                 headers = mapOf("Origin" to animekuUrl)
             ).forEach(callback)
         }, {
             val decrypt = AesHelper.cryptoAESHandler(
-                base64Decode(servers?.mirror ?: return@argamap),
+                base64Decode(servers?.mirror ?: return@argamaps),
                 KEY.toByteArray(),
                 false,
                 "AES/CBC/NoPadding"
             )
             tryParseJson<Mirrors>(decrypt)?.embed?.map { embed ->
-                println("Embed ${embed}")
                 embed.value.apmap {
-                    println("Value ${it.value}")
                     loadFixedExtractor(
                         it.value,
                         embed.key.removePrefix("v"),
@@ -297,4 +308,18 @@ class KuronimeProvider : MainAPI() {
         @JsonProperty("anime") var anime: ArrayList<Anime> = arrayListOf()
     )
 
+}
+
+fun <R> argamaps(
+    vararg transforms: suspend () -> R,
+) = runBlocking {
+    transforms.map {
+        async {
+            try {
+                it.invoke()
+            } catch (e: Exception) {
+                logError(e)
+            }
+        }
+    }.map { it.await() }
 }

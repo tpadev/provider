@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.8.0")
+        classpath("com.android.tools.build:gradle:8.8.2")
         // Cloudstream gradle plugin which makes everything work and builds plugins
         classpath("com.github.recloudstream:gradle:-SNAPSHOT")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
@@ -84,7 +84,7 @@ subprojects {
         }
         // If the task is specifically to compile the app then use the stubs, otherwise us the library.
         if (!useApk) {
-            implementation("com.github.Blatzar:CloudstreamApi:0.1.6")
+            implementation("com.github.Blatzar:CloudstreamApi:0.1.7")
         }
 
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc

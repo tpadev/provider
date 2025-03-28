@@ -11,7 +11,6 @@ cloudstream {
 
     // description = "Lorem Ipsum"
      authors = listOf("Crstlnz")
-
     /**
      * Status int as the following:
      * 0: Down
