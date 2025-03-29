@@ -147,6 +147,7 @@ class MovieBox : MainAPI() {
         val nuxtDataJson = selectFirst("#__NUXT_DATA__")?.html()
         val objectMapper = ObjectMapper()
         val nuxtData = objectMapper.readTree(nuxtDataJson);
+        print(nuxtData.extractNuxtData())
         return objectMapper.convertValue(nuxtData.extractNuxtData(), DetailMovie::class.java)
     }
 

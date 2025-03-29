@@ -268,7 +268,10 @@ data class Resource(
 	val seasons: List<SeasonsItem?>? = null,
 
 	@field:JsonProperty("source")
-	val source: String? = null
+	val source: String? = null,
+
+	@field:JsonProperty("uploadBy")
+	val uploadBy: String? = null
 )
 
 data class MoviePubParam(
