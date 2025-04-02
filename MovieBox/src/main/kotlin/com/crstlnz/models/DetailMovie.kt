@@ -1,7 +1,9 @@
 package com.crstlnz.models
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class DetailMovie(
 	@field:JsonProperty("referer")
 	val referer: String? = null,
@@ -34,6 +36,7 @@ data class DetailMovie(
 	val url: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class MovieCover(
 
 	@field:JsonProperty("avgHueLight")
@@ -67,6 +70,7 @@ data class MovieCover(
 	val height: Int? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Metadata(
 
 	@field:JsonProperty("image")
@@ -88,6 +92,7 @@ data class Metadata(
 	val url: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class ForYouItem(
 
 	@field:JsonProperty("subtitles")
@@ -148,6 +153,7 @@ data class ForYouItem(
 	val countryName: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Subject(
 
 	@field:JsonProperty("subtitles")
@@ -205,6 +211,7 @@ data class Subject(
 	val countryName: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class MovieItem(
 
 	@field:JsonProperty("subtitles")
@@ -262,6 +269,7 @@ data class MovieItem(
 	val countryName: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Resource(
 
 	@field:JsonProperty("seasons")
@@ -274,6 +282,7 @@ data class Resource(
 	val uploadBy: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class MoviePubParam(
 	@field:JsonProperty("uid")
 	val uid: String? = null,
@@ -285,6 +294,7 @@ data class MoviePubParam(
 	val lang: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class SeasonsItem(
 
 	@field:JsonProperty("maxEp")
@@ -297,6 +307,7 @@ data class SeasonsItem(
 	val allEp: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class StarsItem(
 
 	@field:JsonProperty("character")
@@ -315,6 +326,7 @@ data class StarsItem(
 	val staffId: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class TvItem(
 
 	@field:JsonProperty("subtitles")
@@ -372,6 +384,7 @@ data class TvItem(
 	val countryName: String? = null
 )
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Hot(
 
 	@field:JsonProperty("tv")
