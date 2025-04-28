@@ -269,7 +269,7 @@ class MovieBox : MainAPI() {
         if (isMovie) {
             episodes.add(
                 Episode(
-                    "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0",
+                    "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
                     episode = 1,
                     name = data.subject?.title
                 )
@@ -280,7 +280,7 @@ class MovieBox : MainAPI() {
                     seasons.add(SeasonData(season?.se ?: 0, "Season ${season?.se}"))
                     episodes.add(
                         Episode(
-                            "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}",
+                            "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}|${url}",
                             episode = ep,
                             season = season?.se
                         )
@@ -347,7 +347,11 @@ class MovieBox : MainAPI() {
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit
     ): Boolean {
-        val episodeData = app.get(data, headers = mapOf(
+        val datas = data.split("|")
+        val url = datas.first()
+        val referer = datas.getOrNull(1) ?: ""
+        val episodeData = app.get(url, headers = mapOf(
+            "referer" to referer,
             "X-Requested-With" to "XMLHttpRequest",
             "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
             "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
@@ -367,6 +371,7 @@ class MovieBox : MainAPI() {
             )
         }
         try {
+            println(data)
             val subtitleData =
                 app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
                     .parsed<CaptionData>()
