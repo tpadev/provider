@@ -60,7 +60,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class MovieBox : MainAPI() {
-    override var mainUrl = "https://moviebox.ng"
+    override var mainUrl = "https://moviebox.ph"
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
@@ -350,14 +350,16 @@ class MovieBox : MainAPI() {
         val datas = data.split("|")
         val url = datas.first()
         val referer = datas.getOrNull(1) ?: ""
+        println("Referer ${referer}")
         val episodeData = app.get(url, headers = mapOf(
             "referer" to referer,
             "X-Requested-With" to "XMLHttpRequest",
             "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
             "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
-            "Cookie" to "account=6477308143197455184|0|H5||; uuid=dfd88a29-2ade-4634-9f1e-9b8ea1bb3122; i18n_lang=en; acw_tc=b3db8710-4164-420b-94ba-5f90b33d334fd5cd3cbde0dd64ef68dce9810f3d6fc8"
+            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
         )).parsed<EpisodeData>()
 
+        println(episodeData.data?.streams)
         for (stream in episodeData.data?.streams ?: listOf()) {
             callback(
                 ExtractorLink(
