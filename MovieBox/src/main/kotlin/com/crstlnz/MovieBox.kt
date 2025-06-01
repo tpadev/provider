@@ -351,12 +351,13 @@ class MovieBox : MainAPI() {
         val url = datas.first()
         val referer = datas.getOrNull(1) ?: ""
         println("Referer ${referer}")
+        println("Url ${url}")
         val episodeData = app.get(url, headers = mapOf(
             "referer" to referer,
-            "X-Requested-With" to "XMLHttpRequest",
-            "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
-            "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
-            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
+//            "X-Requested-With" to "XMLHttpRequest",
+//            "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
+//            "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+//            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
         )).parsed<EpisodeData>()
 
         println(episodeData.data?.streams)
@@ -373,7 +374,6 @@ class MovieBox : MainAPI() {
             )
         }
         try {
-            println(data)
             val subtitleData =
                 app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
                     .parsed<CaptionData>()
