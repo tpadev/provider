@@ -46,6 +46,7 @@ import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.VideoDownloadHelper
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import okhttp3.RequestBody
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -104,8 +105,8 @@ class MovieBox : MainAPI() {
             headers = mapOf(
                 "X-Requested-With" to "XMLHttpRequest",
                 "content-type" to "application/json",
-                "origin" to "https://moviebox.ng",
-                "referer" to "https://moviebox.ng",
+                "origin" to mainUrl,
+                "referer" to mainUrl,
                 "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
                 "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}"
             )
@@ -349,25 +350,31 @@ class MovieBox : MainAPI() {
         val referer = datas.getOrNull(1) ?: ""
         println("Referer ${referer}")
         println("Url ${url}")
-        val episodeData = app.get(url, headers = mapOf(
-            "referer" to referer,
+        val episodeData = app.get(
+            url, headers = mapOf(
+                "referer" to referer,
 //            "X-Requested-With" to "XMLHttpRequest",
 //            "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
 //            "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
 //            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
-        )).parsed<EpisodeData>()
+            )
+        ).parsed<EpisodeData>()
 
         println(episodeData.data?.streams)
         for (stream in episodeData.data?.streams ?: listOf()) {
+            println("name $name")
+            println("reso ${stream?.resolutions}")
+            println(getQualityFromName(stream?.resolutions ?: ""))
             callback(
-                ExtractorLink(
+                newExtractorLink(
                     source = name,
-                    name = name,
-                    referer = mainUrl,
+                    name = "$name ${stream?.resolutions}",
                     url = (stream?.url ?: "").ensureHttp(),
                     type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
-                    quality = getQualityFromName(stream?.resolutions ?: ""),
-                )
+                ) {
+                    this.referer = referer;
+                    this.quality = getQualityFromName(stream?.resolutions ?: "");
+                }
             )
         }
         try {
