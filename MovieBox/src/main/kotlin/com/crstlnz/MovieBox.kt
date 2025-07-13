@@ -10,9 +10,6 @@ import com.crstlnz.models.EpisodeData
 import com.crstlnz.models.HomeData
 import com.crstlnz.models.HomeSearch
 import com.crstlnz.models.SearchAPI
-import com.crstlnz.utils.AnimeSailEmbed
-import com.crstlnz.utils.getLastNumber
-import com.crstlnz.utils.splitTitles
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper

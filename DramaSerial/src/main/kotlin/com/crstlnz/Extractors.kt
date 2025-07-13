@@ -28,7 +28,7 @@ open class ArmoBiz() : ExtractorApi() {
                 return "pomf2"
             } else if (str.contains("kraken")) {
                 return "Krakenfiles"
-            } else if (str.contains("kowo")){
+            } else if (str.contains("kowo")) {
                 return "Qiwi"
             }
 
@@ -51,13 +51,24 @@ open class ArmoBiz() : ExtractorApi() {
             val src = link.attr("href")
             val name = link.text()
             callback.invoke(
-                ExtractorLink(
-                    name,
+                newExtractorLink(
+                    this.name,
                     name,
                     src,
-                    referer ?: url,
-                    getQualityFromName(link.text().replace("Download Video", "").trim())
+                    ExtractorLinkType.M3U8,
+                    initializer = {
+                        this.quality =
+                            getQualityFromName(link.text().replace("Download Video", "").trim())
+
+                    }
                 )
+//                ExtractorLink(
+//                    name,
+//                    name,
+//                    src,
+//                    referer ?: url,
+//                    getQualityFromName(link.text().replace("Download Video", "").trim())
+//                )
             )
         }
     }

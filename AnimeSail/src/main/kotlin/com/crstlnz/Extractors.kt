@@ -5,9 +5,13 @@ import com.lagradost.cloudstream3.utils.*
 
 
 open class AnimeSailEmbed() : ExtractorApi() {
-    override val mainUrl: String = "https://pixeldrain.com"
+    override val mainUrl: String = "https://154.26.137.28"
     override val name: String = "AnimeSailEmbed"
     override val requiresReferer: Boolean = true
+
+    init {
+        println("Registered AnimeSailEmbed")
+    }
 
     companion object {
         private fun removeResolution(input: String): String {
@@ -28,7 +32,7 @@ open class AnimeSailEmbed() : ExtractorApi() {
                 return "pomf2"
             } else if (str.contains("kraken")) {
                 return "Krakenfiles"
-            } else if (str.contains("kowo")){
+            } else if (str.contains("kowo")) {
                 return "Qiwi"
             }
 
@@ -46,13 +50,14 @@ open class AnimeSailEmbed() : ExtractorApi() {
         val document = app.get(url).document
         val src = document.selectFirst("video source")?.attr("src") ?: return
         callback.invoke(
-            ExtractorLink(
-                name,
+            newExtractorLink(
+                getSource(src),
                 name,
                 src,
-                referer ?: url,
-                Qualities.Unknown.value
-            )
+                ExtractorLinkType.M3U8,
+            ) {
+                this.quality = 5
+            }
         )
     }
 }

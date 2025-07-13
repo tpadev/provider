@@ -191,7 +191,8 @@ class KuronimeProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         val document = app.get(data).document
-        val scriptData = document.selectFirst("div#content script:containsData(is_singular)")?.data() ?: ""
+        val scriptData =
+            document.selectFirst("div#content script:containsData(is_singular)")?.data() ?: ""
         val id = extractEncodedString(scriptData)
             ?: throw ErrorLoadingException("No id found")
         val mediaType = "application/json; charset=utf-8".toMediaType()
@@ -255,16 +256,17 @@ class KuronimeProvider : MainAPI() {
     ) {
         loadExtractor(url ?: return, referer, subtitleCallback) { link ->
             callback.invoke(
-                ExtractorLink(
-                    link.name,
-                    link.name,
-                    link.url,
-                    link.referer,
-                    getQualityFromName(quality),
-                    link.type,
-                    link.headers,
-                    link.extractorData
-                )
+                link
+//                ExtractorLink(
+//                    link.name,
+//                    link.name,
+//                    link.url,
+//                    link.referer,
+//                    getQualityFromName(quality),
+//                    link.type,
+//                    link.headers,
+//                    link.extractorData
+//                )
             )
         }
     }

@@ -70,20 +70,21 @@ subprojects {
     }
 
     dependencies {
-        val apk by configurations
-        val implementation by configurations
-
-        apk("com.lagradost:cloudstream3:pre-release")
-
         val apkTasks = listOf("deployWithAdb", "build")
         val useApk = gradle.startParameter.taskNames.any { taskName ->
             apkTasks.any { apkTask ->
                 taskName.contains(apkTask, ignoreCase = true)
             }
         }
+
+        val implementation by configurations
+        val apk by configurations
+        apk("com.lagradost:cloudstream3:pre-release")
         // If the task is specifically to compile the app then use the stubs, otherwise us the library.
-        if (!useApk) {
-            implementation("com.github.Blatzar:CloudstreamApi:0.1.7")
+        if (useApk) {
+            // Stubs for all Cloudstream classes
+        } else {
+//            implementation("com.github.Blatzar:CloudstreamApi:0.1.7")
         }
 
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc

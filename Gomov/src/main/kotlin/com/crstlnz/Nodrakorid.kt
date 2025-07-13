@@ -5,6 +5,9 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.*
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jsoup.nodes.Element
 import java.net.URI
 
@@ -27,27 +30,38 @@ class Nodrakorid : Gomov() {
                     val doc = app.get(url).document
                     this.comingSoon = false
                     this.episodes = when {
-                        doc.select("div.vid-episodes a, div.gmr-listseries a").isNotEmpty() -> this.episodes
+                        doc.select("div.vid-episodes a, div.gmr-listseries a")
+                            .isNotEmpty() -> this.episodes
+
                         doc.select("div#download").isEmpty() -> {
                             doc.select("div.entry-content p:contains(Episode)").distinctBy {
                                 it.text()
                             }.mapNotNull { eps ->
-                                val endSibling = eps.nextElementSiblings().select("p:contains(Episode)").firstOrNull() ?: eps.nextElementSiblings().select("div.content-moviedata").firstOrNull()
+                                val endSibling =
+                                    eps.nextElementSiblings().select("p:contains(Episode)")
+                                        .firstOrNull() ?: eps.nextElementSiblings()
+                                        .select("div.content-moviedata").firstOrNull()
                                 val siblings = eps.nextElementSiblingsUntil(endSibling).map { ele ->
-                                    ele.ownText().filter { it.isDigit() }.toIntOrNull() to ele.select("a")
+                                    ele.ownText().filter { it.isDigit() }
+                                        .toIntOrNull() to ele.select("a")
                                         .map { it.attr("href") to it.text() }
                                 }.filter { it.first != null }
                                 Episode(siblings.toJson(), episode = eps.text().toEpisode())
                             }
                         }
+
                         else -> {
                             doc.select("div#download h3.title-download").mapNotNull { eps ->
                                 val siblings = eps.nextElementSibling()?.select("li")?.map { ele ->
-                                    ele.text().filter { it.isDigit() }.toIntOrNull() to ele.select("a").map {
+                                    ele.text().filter { it.isDigit() }
+                                        .toIntOrNull() to ele.select("a").map {
                                         it.attr("href") to it.text().split(" ").first()
                                     }
                                 }?.filter { it.first != null }
-                                Episode(siblings?.toJson() ?: return@mapNotNull null, episode = eps.text().toEpisode())
+                                Episode(
+                                    siblings?.toJson() ?: return@mapNotNull null,
+                                    episode = eps.text().toEpisode()
+                                )
                             }
                         }
                     }
@@ -97,7 +111,7 @@ class Nodrakorid : Gomov() {
         }
     }
 
-    private fun String.toEpisode() : Int? {
+    private fun String.toEpisode(): Int? {
         return Regex("(?i)Episode\\s?([0-9]+)").find(this)?.groupValues?.getOrNull(1)?.toIntOrNull()
     }
 
@@ -115,18 +129,23 @@ class Nodrakorid : Gomov() {
         callback: (ExtractorLink) -> Unit
     ) {
         loadExtractor(url, referer, subtitleCallback) { link ->
-            callback.invoke(
-                ExtractorLink(
-                    link.name,
-                    link.name,
-                    link.url,
-                    link.referer,
-                    if(link.type == ExtractorLinkType.M3U8) link.quality else quality ?: Qualities.Unknown.value,
-                    link.type,
-                    link.headers,
-                    link.extractorData
+            CoroutineScope(Dispatchers.IO).launch {
+                callback.invoke(
+                    newExtractorLink(
+                        link.name,
+                        link.name,
+                        link.url,
+                        link.type
+                    ) {
+                        this.headers = link.headers
+                        this.referer = link.referer
+                        this.quality =
+                            if (link.type == ExtractorLinkType.M3U8) link.quality else quality
+                                ?: Qualities.Unknown.value;
+                        this.extractorData = link.extractorData
+                    }
                 )
-            )
+            }
         }
     }
 

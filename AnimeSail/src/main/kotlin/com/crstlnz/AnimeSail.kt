@@ -34,8 +34,10 @@ import com.lagradost.cloudstream3.newAnimeLoadResponse
 import com.lagradost.cloudstream3.newAnimeSearchResponse
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -248,67 +250,76 @@ class AnimeSail : MainAPI() {
             if (linkEl.attr("data-em") == "") continue
             val iframe = String(Base64.decode(linkEl.attr("data-em").toByteArray()))
             val link = Jsoup.parse(iframe).selectFirst("iframe")?.attr("src") ?: ""
-            val name = linkEl.text()
-            customLoadExtractor(
-                name,
+//            val name = linkEl.text()
+            println(link)
+            loadExtractor(
                 link,
-                null,
-                subtitleCallback,
-                callback
-            )
+                subtitleCallback = {}
+            ) { link ->
+                callback(link)
+            }
         }
         return true
     }
 
-    private suspend fun customLoadExtractor(
-        name: String,
-        url: String,
-        referer: String? = null,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        if (url.contains("dood")) return true
-        if (url.contains("154.26.137.28")) {
-            AnimeSailEmbed().getUrl(
-                url,
-                name,
-                subtitleCallback = subtitleCallback,
-            ) { link ->
-                callback.invoke(
-                    ExtractorLink(
-                        AnimeSailEmbed.getSource(link.name) ?: link.name,
-                        name,
-                        link.url,
-                        link.referer,
-                        getQualityFromName(name),
-                        link.type,
-                        link.headers,
-                        link.extractorData
-                    )
-                )
-            }
-        } else {
-            loadExtractor(
-                url,
-                referer,
-                subtitleCallback
-            ) { link ->
-                callback.invoke(
-                    ExtractorLink(
-                        link.name,
-                        name,
-                        link.url,
-                        link.referer,
-                        getQualityFromName(name),
-                        link.type,
-                        link.headers,
-                        link.extractorData
-                    )
-                )
-            }
-        }
-        return true
-    }
+//    private suspend fun customLoadExtractor(
+//        name: String,
+//        url: String,
+//        referer: String? = null,
+//        subtitleCallback: (SubtitleFile) -> Unit,
+//        callback: (ExtractorLink) -> Unit
+//    ): Boolean {
+//        if (url.contains("dood")) return true
+//        if (url.contains("154.26.137.28")) {
+//            AnimeSailEmbed().getUrl(
+//                url,
+//                name,
+//                subtitleCallback = subtitleCallback,
+//            ) { link ->
+//                callback.invoke(
+//                    newExtractorLink(
+//                        AnimeSailEmbed.getSource(link.name) ?: link.name,
+//                        name,
+//                        link.url,
+//                        ExtractorLinkType.M3U8
+//                    ) {
+//                        this.referer = link.referer
+//                        this.quality = Qualities.P1080.value
+//                    }
+////                    ExtractorLink(
+////                        AnimeSailEmbed.getSource(link.name) ?: link.name,
+////                        name,
+////                        link.url,
+////                        link.referer,
+////                        getQualityFromName(name),
+////                        link.type,
+////                        link.headers,
+////                        link.extractorData
+////                    )
+//                )
+//            }
+//        } else {
+//            loadExtractor(
+//                url,
+//                referer,
+//                subtitleCallback
+//            ) { link ->
+//                callback.invoke(
+//                    ExtractorLink(
+//                        link.name,
+//                        name,
+//                        link.url,
+//                        link.referer,
+//                        getQualityFromName(name),
+//                        link.type,
+//                        link.headers,
+//                        link.extractorData
+//                    )
+//                )
+//            }
+//        }
+//        return true
+//    }
 
     data class Streamsb(
         @JsonProperty("link") val link: String?,
