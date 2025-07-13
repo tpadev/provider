@@ -60,7 +60,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class MovieBox : MainAPI() {
-    override var mainUrl = "https://moviebox.ph"
+    override var mainUrl = "https://moviebox.ng"
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
