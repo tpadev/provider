@@ -52,6 +52,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -338,6 +339,17 @@ class MovieBox : MainAPI() {
         }
     }
 
+    fun addUrlParams(baseUrl: String, params: Map<String, String>): String {
+        if (params.isEmpty()) return baseUrl
+
+        val separator = if (baseUrl.contains("?")) "&" else "?"
+        val encodedParams = params.entries.joinToString("&") { (key, value) ->
+            "${URLEncoder.encode(key, "UTF-8")}=${URLEncoder.encode(value, "UTF-8")}"
+        }
+
+        return "$baseUrl$separator$encodedParams"
+    }
+
     @OptIn(ExperimentalEncodingApi::class)
     override suspend fun loadLinks(
         data: String,
@@ -360,20 +372,21 @@ class MovieBox : MainAPI() {
             )
         ).parsed<EpisodeData>()
 
-        println(episodeData.data?.streams)
         for (stream in episodeData.data?.streams ?: listOf()) {
-            println("name $name")
-            println("reso ${stream?.resolutions}")
-            println(getQualityFromName(stream?.resolutions ?: ""))
+            val quality = getQualityFromName(stream?.resolutions ?: "")
             callback(
                 newExtractorLink(
                     source = name,
-                    name = "$name ${stream?.resolutions}",
-                    url = (stream?.url ?: "").ensureHttp(),
+                    name = name,
+                    url = addUrlParams(
+                        (stream?.url ?: "").ensureHttp(), mapOf(
+                            "_q" to quality.toString()
+                        )
+                    ),
                     type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
                 ) {
-                    this.referer = referer;
-                    this.quality = getQualityFromName(stream?.resolutions ?: "");
+                    this.referer = referer
+                    this.quality = quality
                 }
             )
         }
