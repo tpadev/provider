@@ -59,7 +59,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class MovieBox : MainAPI() {
-    override var mainUrl = "https://moviebox.ng"
+    override var mainUrl = "https://moviebox.ph"
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
@@ -230,8 +230,8 @@ class MovieBox : MainAPI() {
             headers = mapOf(
                 "X-Requested-With" to "XMLHttpRequest",
                 "content-type" to "application/json",
-                "origin" to "https://moviebox.ng",
-                "referer" to "https://moviebox.ng",
+                "origin" to mainUrl,
+                "referer" to mainUrl,
                 "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
                 "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}"
             )
