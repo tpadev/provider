@@ -267,10 +267,12 @@ class MovieBox : MainAPI() {
         val seasons = mutableListOf<SeasonData>()
         if (isMovie) {
             episodes.add(
-                newEpisode("${videoPageUrl}/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}", {
-                    episode = 1
-                    name = data.subject?.title
-                })
+                newEpisode(
+                    "${videoPageUrl}/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
+                    {
+                        episode = 1
+                        name = data.subject?.title
+                    })
 
             )
         } else {
@@ -278,11 +280,12 @@ class MovieBox : MainAPI() {
                 for (ep in 1..(season?.maxEp ?: 0)) {
                     seasons.add(SeasonData(season?.se ?: 0, "Season ${season?.se}"))
                     episodes.add(
-                        Episode(
+                        newEpisode(
                             "$videoPageUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}|${url}",
-                            episode = ep,
-                            season = season?.se
-                        )
+                            {
+                                this.episode = ep
+                                this.season = season?.se
+                            })
                     )
                 }
             }
