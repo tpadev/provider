@@ -62,7 +62,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 class MovieBox : MainAPI() {
     override var mainUrl = "https://moviebox.id"
 
-    //    var videoPageUrl = "https://fmoviesunblocked.net"
+    var videoRefererBaseUrl = "https://fmoviesunblocked.net"
     var videoPageUrl = mainUrl
     override var name = "MovieBox"
     override val hasMainPage = true
@@ -386,7 +386,7 @@ class MovieBox : MainAPI() {
 //            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
             )
         ).parsed<EpisodeData>()
-        println("Episode Data ${episodeData}")
+//        println("Episode Data ${episodeData}")
 
         for (stream in episodeData.data?.streams ?: listOf()) {
             val quality = getQualityFromName(stream?.resolutions ?: "")
@@ -401,7 +401,7 @@ class MovieBox : MainAPI() {
                     ),
                     type = stream?.format?.getStreamType() ?: ExtractorLinkType.VIDEO,
                 ) {
-                    this.referer = referer
+                    this.referer = referer.replace(mainUrl, videoRefererBaseUrl)
                     this.quality = quality
                 }
             )
