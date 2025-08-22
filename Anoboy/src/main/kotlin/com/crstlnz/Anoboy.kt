@@ -128,7 +128,9 @@ class Anoboy : MainAPI() {
         val description = document.selectFirst(".column-three-fourth .unduhan")?.text()
         val episodes = mutableListOf<Episode>()
         if (document.isWatchPage()) {
-            episodes.add(Episode(url, title))
+            episodes.add(newEpisode(url, {
+                name = title
+            }))
         } else {
             val eps = document.select(".singlelink ul li").map {
                 if(it.ownText().lowercase().contains("download")){
