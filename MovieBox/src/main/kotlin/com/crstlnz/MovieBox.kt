@@ -61,7 +61,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class MovieBox : MainAPI() {
     override var mainUrl = "https://moviebox.id"
-    var videoPageUrl = "https://fmoviesunblocked.net"
+
+    //    var videoPageUrl = "https://fmoviesunblocked.net"
+    var videoPageUrl = mainUrl
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
@@ -249,8 +251,18 @@ class MovieBox : MainAPI() {
         } ?: listOf()
     }
 
+    fun transformUrl(url: String): String {
+        val base = url.replace("/detail/", "/spa/videoPlayPage/movies/")
+        val queries = base.substringAfter("?", "")
+            .split("&")
+            .filter { it.startsWith("id=") || it.startsWith("type=") }
+            .joinToString("&")
+        return base.substringBefore("?") + "?" + queries
+    }
+
     override suspend fun load(url: String): AnimeLoadResponse {
         val data = app.get(url).document.toDetailMovie()
+        val referer = transformUrl(url)
         val isMovie =
             data.resource?.seasons == null || data.resource.seasons.find { it?.maxEp == 0 || it?.se == 0 } != null
         val type = getTvType(data.subject?.genre, isMovie)
@@ -268,7 +280,7 @@ class MovieBox : MainAPI() {
         if (isMovie) {
             episodes.add(
                 newEpisode(
-                    "${videoPageUrl}/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
+                    "${videoPageUrl}/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${referer}",
                     {
                         episode = 1
                         name = data.subject?.title
@@ -369,11 +381,12 @@ class MovieBox : MainAPI() {
             url, headers = mapOf(
                 "referer" to referer,
 //            "X-Requested-With" to "XMLHttpRequest",
-//            "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
+                "x-client-info" to "{\"timezone\":\"Asia/Jakarta\"}",
 //            "user-agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
 //            "Cookie" to "account=849960928765527600|0|H5|1746602024|"
             )
         ).parsed<EpisodeData>()
+        println("Episode Data ${episodeData}")
 
         for (stream in episodeData.data?.streams ?: listOf()) {
             val quality = getQualityFromName(stream?.resolutions ?: "")

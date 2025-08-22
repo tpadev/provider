@@ -1,5 +1,6 @@
 package com.crstlnz
 
+import com.lagradost.cloudstream3.DubStatus
 import com.lagradost.cloudstream3.MainPageRequest
 
 suspend fun main() {
@@ -7,18 +8,19 @@ suspend fun main() {
 //    val mainPageData = api.mainPage.first()
 //    val data =  api.getMainPage(1, MainPageRequest(mainPageData.name, mainPageData.data, true))
 
-//    val movieData = api.load("https://moviebox.id/detail/peacemaker-mpXuq5gyju?id=410381707066627104&scene=&page_from=home_Trending+Now%F0%9F%94%A5&type=/movie/detail&utm_source=")
-//    println(movieData.episodes)
-//    val urlLoad = api.loadLinks(
-//        "https://moviebox.id/wefeed-h5-bff/web/subject/play?subjectId=7514322883121141456&se=1&ep=1|https://moviebox.id/movies/bitch-x-rich-ifBHIf4G5X8?id=7514322883121141456&scene=&page_from=home_Top+20%F0%9F%94%A5&type=/movie/detail&utm_source=",
-//        false,
-//        {
-//
-//        },
-//        {
-//            println(it)
-//        }
-//    )
+    val movieData = api.load("https://moviebox.id/detail/deadpool-and-wolverine-UmD1pHY6xU9?id=8319000940355404624&scene=&page_from=search_detail&type=/movie/detail&utm_source=")
+    println(movieData.episodes)
+    val urlLoad = api.loadLinks(
+        movieData.episodes.values.first().first().data,
+//        "https://fmoviesunblocked.net/wefeed-h5-bff/web/subject/play?subjectId=8319000940355404624&se=0&ep=0|https://moviebox.id/detail/deadpool-and-wolverine-UmD1pHY6xU9?id=8319000940355404624&scene=&page_from=search_detail&type=/movie/detail&utm_source=",
+        false,
+        {
+
+        },
+        {
+            println(it)
+        }
+    )
 //    ProviderTester(MovieBox())
 //    providerTester.testLoad("https://moviebox.ng/movies/niyala-QEfogF0boQa?id=9102201097187460288&scene=&type=/movie/detail")
 //    providerTester.testLoadLinks("https://moviebox.ng/wefeed-h5-bff/web/subject/play?subjectId=3089349649006742360&se=1&ep=1")
