@@ -46,7 +46,9 @@ class Nodrakorid : Gomov() {
                                         .toIntOrNull() to ele.select("a")
                                         .map { it.attr("href") to it.text() }
                                 }.filter { it.first != null }
-                                Episode(siblings.toJson(), episode = eps.text().toEpisode())
+                                newEpisode(siblings.toJson(), {
+                                    this.episode = eps.text().toEpisode()
+                                })
                             }
                         }
 
@@ -58,10 +60,9 @@ class Nodrakorid : Gomov() {
                                         it.attr("href") to it.text().split(" ").first()
                                     }
                                 }?.filter { it.first != null }
-                                Episode(
-                                    siblings?.toJson() ?: return@mapNotNull null,
-                                    episode = eps.text().toEpisode()
-                                )
+                                newEpisode(siblings?.toJson() ?: return@mapNotNull null, {
+                                    this.episode = eps.text().toEpisode()
+                                })
                             }
                         }
                     }

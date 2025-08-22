@@ -22,18 +22,20 @@ class Pusatfilm : Gomov() {
             when (this) {
                 is TvSeriesLoadResponse -> {
                     val document = app.get(url).document
-                    this.episodes = document.select("div.vid-episodes a, div.gmr-listseries a").map { eps ->
-                        val href = fixUrl(eps.attr("href"))
-                        val name = eps.attr("title")
-                        val episode = "Episode\\s*(\\d+)".toRegex().find(name)?.groupValues?.get(1)
-                        val season = "Season\\s*(\\d+)".toRegex().find(name)?.groupValues?.get(1)
-                        Episode(
-                            href,
-                            name,
-                            season = season?.toIntOrNull(),
-                            episode = episode?.toIntOrNull(),
-                        )
-                    }.filter { it.episode != null }
+                    this.episodes =
+                        document.select("div.vid-episodes a, div.gmr-listseries a").map { eps ->
+                            val href = fixUrl(eps.attr("href"))
+                            val name = eps.attr("title")
+                            val episode =
+                                "Episode\\s*(\\d+)".toRegex().find(name)?.groupValues?.get(1)
+                            val season =
+                                "Season\\s*(\\d+)".toRegex().find(name)?.groupValues?.get(1)
+                            newEpisode(href, initializer = {
+                                this.name = name
+                                this.season = season?.toIntOrNull()
+                                this.episode = episode?.toIntOrNull()
+                            })
+                        }.filter { it.episode != null }
                 }
             }
         }

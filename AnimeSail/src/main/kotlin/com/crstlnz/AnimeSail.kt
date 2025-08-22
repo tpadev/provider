@@ -32,6 +32,7 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.newAnimeLoadResponse
 import com.lagradost.cloudstream3.newAnimeSearchResponse
+import com.lagradost.cloudstream3.newEpisode
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
@@ -185,11 +186,10 @@ class AnimeSail : MainAPI() {
             if (it.text().lowercase().contains("download")) {
                 null
             } else {
-                Episode(
-                    (it.selectFirst("a")?.attr("href") ?: "").toString(),
-                    episode = it.text().getLastNumber(),
-                    name = it.text().replace("Subtitle Indonesia", "")
-                )
+                newEpisode((it.selectFirst("a")?.attr("href") ?: "").toString(), initializer = {
+                    this.episode =  it.text().getLastNumber()
+                    this.name =  it.text().replace("Subtitle Indonesia", "")
+                })
             }
         }
         episodes.addAll(eps.filterNotNull())

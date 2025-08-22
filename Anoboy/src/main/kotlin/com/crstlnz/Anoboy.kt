@@ -134,10 +134,9 @@ class Anoboy : MainAPI() {
                 if(it.ownText().lowercase().contains("download")){
                     null
                 }else{
-                    Episode(
-                        (it.selectFirst("a")?.attr("href") ?: "").toString(),
-                        episode = it.ownText().getLastNumber()
-                    )
+                    newEpisode((it.selectFirst("a")?.attr("href") ?: "").toString(), {
+                        this.episode = it.ownText().getLastNumber()
+                    })
                 }
             }
             episodes.addAll(eps.filterNotNull())

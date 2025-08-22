@@ -39,6 +39,7 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.newAnimeLoadResponse
 import com.lagradost.cloudstream3.newAnimeSearchResponse
+import com.lagradost.cloudstream3.newEpisode
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -60,6 +61,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 class MovieBox : MainAPI() {
     override var mainUrl = "https://moviebox.id"
+    var videoPageUrl = "https://fmoviesunblocked.net"
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
@@ -265,11 +267,11 @@ class MovieBox : MainAPI() {
         val seasons = mutableListOf<SeasonData>()
         if (isMovie) {
             episodes.add(
-                Episode(
-                    "https://fmoviesunblocked.net/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
-                    episode = 1,
+                newEpisode("${videoPageUrl}/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}", {
+                    episode = 1
                     name = data.subject?.title
-                )
+                })
+
             )
         } else {
             for (season in data.resource?.seasons ?: listOf()) {
@@ -277,7 +279,7 @@ class MovieBox : MainAPI() {
                     seasons.add(SeasonData(season?.se ?: 0, "Season ${season?.se}"))
                     episodes.add(
                         Episode(
-                            "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}|${url}",
+                            "$videoPageUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=${season?.se}&ep=${ep}|${url}",
                             episode = ep,
                             season = season?.se
                         )
@@ -390,7 +392,7 @@ class MovieBox : MainAPI() {
         }
         try {
             val subtitleData =
-                app.get("$mainUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
+                app.get("$videoPageUrl/wefeed-h5-bff/web/subject/caption?format=MP4&id=${episodeData.data?.streams?.first()?.id}&subjectId=${data.extractSubjectId()}")
                     .parsed<CaptionData>()
             for (caption in subtitleData.data?.captions ?: listOf()) {
                 val lang = caption?.lanName ?: caption?.lan ?: ""

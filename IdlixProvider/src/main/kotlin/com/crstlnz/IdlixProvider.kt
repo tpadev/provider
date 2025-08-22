@@ -154,13 +154,12 @@ class IdlixProvider : MainAPI() {
                     .toIntOrNull()
                 val season = it.select("div.numerando").text().replace(" ", "").split("-").first()
                     .toIntOrNull()
-                Episode(
-                    href,
-                    name,
-                    season,
-                    episode,
-                    image
-                )
+                newEpisode(href, {
+                    this.name = name
+                    this.episode = episode
+                    this.season = season
+                    this.posterUrl = image
+                })
             }
             newTvSeriesLoadResponse(title, url, TvType.TvSeries, episodes) {
                 this.posterUrl = poster

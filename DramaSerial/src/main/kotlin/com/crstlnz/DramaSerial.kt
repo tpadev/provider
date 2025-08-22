@@ -42,6 +42,7 @@ import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.newAnimeLoadResponse
 import com.lagradost.cloudstream3.newAnimeSearchResponse
+import com.lagradost.cloudstream3.newEpisode
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
@@ -201,19 +202,17 @@ class DramaSerial : MainAPI() {
         val episodes = mutableListOf<Episode>()
         val seasons = mutableListOf<SeasonData>()
         episodes.add(
-            Episode(
-                url,
-                episode = 1
-            )
+            newEpisode(url, {
+                this.episode = 1
+            })
         )
 
         val episodesEl = data.select(".page-links a")
         for (episode in episodesEl) {
             episodes.add(
-                Episode(
-                    episode.attr("href"),
-                    episode = episode.select(".page-link-number").text().toInt()
-                )
+                newEpisode(episode.attr("href"), {
+                    this.episode = episode.select(".page-link-number").text().toInt()
+                })
             )
         }
         val img = (data.selectFirst(".gmr-movie-data img")?.attr("src") ?: "").replace("-60x90", "")
