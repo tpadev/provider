@@ -10,7 +10,7 @@ suspend fun main() {
 //    val movieData = api.load("https://moviebox.ng/movies/bitch-x-rich-ifBHIf4G5X8?id=7514322883121141456&scene=&page_from=home_Top+20%F0%9F%94%A5&type=/movie/detail&utm_source=")
 //    println(movieData.episodes)
     val urlLoad = api.loadLinks(
-        "https://moviebox.ph/wefeed-h5-bff/web/subject/play?subjectId=7514322883121141456&se=1&ep=1|https://moviebox.ph/movies/bitch-x-rich-ifBHIf4G5X8?id=7514322883121141456&scene=&page_from=home_Top+20%F0%9F%94%A5&type=/movie/detail&utm_source=",
+        "https://moviebox.id/wefeed-h5-bff/web/subject/play?subjectId=7514322883121141456&se=1&ep=1|https://moviebox.id/movies/bitch-x-rich-ifBHIf4G5X8?id=7514322883121141456&scene=&page_from=home_Top+20%F0%9F%94%A5&type=/movie/detail&utm_source=",
         false,
         {
 

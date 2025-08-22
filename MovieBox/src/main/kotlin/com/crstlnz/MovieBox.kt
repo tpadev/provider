@@ -59,7 +59,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 
 class MovieBox : MainAPI() {
-    override var mainUrl = "https://moviebox.ph"
+    override var mainUrl = "https://moviebox.id"
     override var name = "MovieBox"
     override val hasMainPage = true
     override var lang = "id"
@@ -252,8 +252,6 @@ class MovieBox : MainAPI() {
         val isMovie =
             data.resource?.seasons == null || data.resource.seasons.find { it?.maxEp == 0 || it?.se == 0 } != null
         val type = getTvType(data.subject?.genre, isMovie)
-        print("Typenya : ")
-        println(type)
         val year = data.subject?.releaseDate?.getYear()
         val tracker = if (data.subject?.countryName === "Japan")
             APIHolder.getTracker(
@@ -268,7 +266,7 @@ class MovieBox : MainAPI() {
         if (isMovie) {
             episodes.add(
                 Episode(
-                    "$mainUrl/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
+                    "https://fmoviesunblocked.net/wefeed-h5-bff/web/subject/play?subjectId=${data.subject?.subjectId}&se=0&ep=0|${url}",
                     episode = 1,
                     name = data.subject?.title
                 )
