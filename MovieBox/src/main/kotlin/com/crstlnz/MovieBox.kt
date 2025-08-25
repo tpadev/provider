@@ -96,7 +96,7 @@ class MovieBox : MainAPI() {
         "6528093688173053896" to "Indonesian Movies",
         "7132534597631837112" to "Animation",
         "5404290953194750296" to "Popular Anime",
-        "8633255642729513824" to "Monsters".
+        "8633255642729513824" to "Monsters",
         "137968062304845992" to "Short kaga jelas",
     )
 
