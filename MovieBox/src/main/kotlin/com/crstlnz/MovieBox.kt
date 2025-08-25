@@ -85,14 +85,19 @@ class MovieBox : MainAPI() {
     }
 
     override val mainPage = mainPageOf(
-        "872031290915189720" to "Top 20",
-        "6001471894749331600" to "Ramadhan",
-
-        "4380734070238626200" to "Hot K-Drama",
-        "6528093688173053896" to "Film Indonesia Baru",
-
-        "movie_hottest" to "Film Paling Top",
-        "997144265920760504" to "Film Populer",
+        "872031290915189720" to "Trending Now",
+        "6945408232127449944" to "New Release",
+        "997144265920760504" to "Hollywood Movie",
+        "2540573817806670120" to "Western Serial",
+        "4380734070238626200" to "Korean Drama",
+        "8624142774394406504" to "Chinese Drama",
+        "1164329479448281992" to "Thai Drama",
+        "5283462032510044280" to "Indonesian Drama",
+        "6528093688173053896" to "Indonesian Movies",
+        "7132534597631837112" to "Animation",
+        "5404290953194750296" to "Popular Anime",
+        "8633255642729513824" to "Monsters".
+        "137968062304845992" to "Short kaga jelas",
     )
 
     override suspend fun getMainPage(
