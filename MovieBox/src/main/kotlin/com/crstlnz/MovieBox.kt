@@ -93,7 +93,6 @@ class MovieBox : MainAPI() {
         "5283462032510044280" to "Sinetron Favorite\uD83D\uDC97",
         "movie_hottest" to "Film Paling Top",
         "997144265920760504" to "Film Populer",
-        "animation_hottest" to "Top Anime",
     )
 
     override suspend fun getMainPage(
