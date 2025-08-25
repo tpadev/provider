@@ -1,0 +1,69 @@
+[
+    {
+        "iconUrl": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://tv4.dramaserial.id/&size=64",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/tpadev/provider",
+        "fileSize": 58653,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Crstlnz"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Movie",
+            "TvSeries",
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 3,
+        "internalName": "DramaSerial",
+        "url": "https://raw.githubusercontent.com/tpadev/provider/builds/DramaSerial.cs3",
+        "name": "DramaSerial"
+    },
+    {
+        "iconUrl": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://idlixian.com&size=16",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/tpadev/provider",
+        "fileSize": 27191,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Crstlnz"
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie",
+            "Anime",
+            "AsianDrama"
+        ],
+        "version": 5,
+        "internalName": "IdlixProvider",
+        "url": "https://raw.githubusercontent.com/tpadev/provider/builds/IdlixProvider.cs3",
+        "name": "IdlixProvider"
+    },
+    {
+        "iconUrl": "https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://moviebox.ng/&size=64",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/tpadev/provider",
+        "fileSize": 63266,
+        "status": 1,
+        "language": "id",
+        "authors": [
+            "Crstlnz"
+        ],
+        "tvTypes": [
+            "AsianDrama",
+            "Movie",
+            "TvSeries",
+            "AnimeMovie",
+            "Anime",
+            "OVA"
+        ],
+        "version": 27,
+        "internalName": "MovieBox",
+        "url": "https://raw.githubusercontent.com/tpadev/provider/builds/MovieBox.cs3",
+        "name": "MovieBox"
+    }
+]
