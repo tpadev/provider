@@ -9,9 +9,11 @@ import com.lagradost.cloudstream3.network.CloudflareKiller
 import com.lagradost.cloudstream3.utils.*
 import org.jsoup.nodes.Element
 import java.net.URI
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class IdlixProvider : MainAPI() {
-    override var mainUrl = "http://207.180.246.188/"
+    override var mainUrl = "https://idlixian.com"
     private var directUrl = mainUrl
     override var name = "Idlix+"
     override val hasMainPage = true
@@ -25,12 +27,45 @@ class IdlixProvider : MainAPI() {
         TvType.AsianDrama
     )
 
+
+    init {
+        // this runs once when the provider is created
+        try {
+            val client = OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build()
+
+            val request = Request.Builder()
+                .url(mainUrl)
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                val finalUrl = response.request.url.toString()
+                mainUrl = finalUrl
+                directUrl = finalUrl
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     override val mainPage = mainPageOf(
         "$mainUrl/" to "Featured",
-        "$mainUrl/trending/page/?get=movies" to "Trending Movies",
-        "$mainUrl/trending/page/?get=tv" to "Trending TV Series",
-        "$mainUrl/movie/page/" to "Movie Terbaru",
-        "$mainUrl/tvseries/page/" to "TV Series Terbaru",
+        "$mainUrl/network/netflix/page/" to "Netflix",
+        "$mainUrl/network/amazon/page/" to "Amazon",
+        "$mainUrl/network/apple-tv/page/" to "AppleTV+",
+        "$mainUrl/network/disney/page/" to "Disney+",
+        "$mainUrl/network/hbo/page/" to "HBO",
+        "$mainUrl/genre/drama-korea/page/" to "Drama Korea",
+        "$mainUrl/genre/drama-jepang/page/" to "Drama Japan",
+        "$mainUrl/genre/drama-china/page/" to "Drama China",
+        "$mainUrl/genre/drama-thai/page/" to "Drama Thailand",
+
+//        "$mainUrl/trending/page/?get=movies" to "Trending Movies",
+//        "$mainUrl/trending/page/?get=tv" to "Trending TV Series",
+//        "$mainUrl/movie/page/" to "Movie Terbaru",
+//        "$mainUrl/tvseries/page/" to "TV Series Terbaru",
 //        "$mainUrl/network/netflix/page/" to "Netflix",
 //        "$mainUrl/genre/anime/page/" to "Anime",
 //        "$mainUrl/genre/drama-korea/page/" to "Drama Korea",
