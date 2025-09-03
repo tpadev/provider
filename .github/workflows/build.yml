@@ -11,7 +11,8 @@ on:
     branches:
       # choose your default branch
       - master
-      - main
+    paths:
+      - build.gradle.kts
     paths-ignore:
       - '*.md'
 
