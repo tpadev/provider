@@ -229,7 +229,6 @@ class IdlixProvider : MainAPI() {
     ): Boolean {
 
         val document = app.get(data).document
-        println(document)
         document.select("ul#playeroptionsul > li").map {
             Triple(
                 it.attr("data-post"),
