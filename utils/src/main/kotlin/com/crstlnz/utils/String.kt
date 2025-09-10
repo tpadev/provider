@@ -1,4 +1,4 @@
-package com.crstlnz.utils
+package com.tpadev.utils
 
 import android.content.Context
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin

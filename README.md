@@ -1,3 +1,4 @@
+# `Cloudstream3 ID Extension`
 # `Cloudstream3 Plugin Repo Template`
 
 Template for a [Cloudstream3](https://github.com/recloudstream) plugin repo

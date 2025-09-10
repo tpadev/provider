@@ -1,4 +1,4 @@
-rootProject.name = "CrstlnzProviders"
+rootProject.name = "tpadev-csidext"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

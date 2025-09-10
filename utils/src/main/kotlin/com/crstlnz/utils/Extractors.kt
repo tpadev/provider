@@ -1,4 +1,4 @@
-package com.crstlnz.utils
+package com.tpadev.utils
 
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.app
