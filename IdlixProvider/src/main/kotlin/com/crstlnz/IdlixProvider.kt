@@ -309,6 +309,8 @@ class IdlixProvider : MainAPI() {
             headers = mapOf("X-Requested-With" to "XMLHttpRequest")
         ).parsed<ResponseSource>().videoSource
 
+        println(m3uLink)
+
         M3u8Helper.generateM3u8(
             this.name,
             m3uLink,
