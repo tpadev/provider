@@ -57,7 +57,6 @@ import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import android.util.Log
 
 class MovieBox : MainAPI() {
     override var mainUrl = "https://moviebox.id"
@@ -122,7 +121,6 @@ class MovieBox : MainAPI() {
         )
 
         println(res.text)
-        log.i(newTAG, "this come after res.txt")
         val data = res.parsed<HomeSearch>()
         return newHomePageResponse(request.name, data.data?.subjectList?.map {
             newMovieSearchResponse(
