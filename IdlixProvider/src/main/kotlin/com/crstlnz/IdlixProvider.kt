@@ -302,7 +302,7 @@ class IdlixProvider : MainAPI() {
         val document = app.get(url, referer = referer).document
         val hash = url.split("/").last().substringAfter("data=")
 
-        val m3uLinkjson = app.post(
+        val m3usrc = app.post(
             url = "https://jeniusplay.com/player/index.php?data=$hash&do=getVideo",
             data = mapOf("hash" to hash, "r" to "$referer"),
             referer = referer,
@@ -310,20 +310,23 @@ class IdlixProvider : MainAPI() {
         ).parsed<ResponseSource>().videoSource
 
         // Replace .txt at the end with .m3u8
-        val m3uLink = if (m3uLinkjson.endsWith(".txt")) {
-            m3uLinkjson.substringBeforeLast(".") + ".m3u8"
-        } else {
-            m3uLink = m3uLinkjson
+        val m3uLink = m3usrc?.let {
+            if (it.endsWith(".txt")) {
+                it.substringBeforeLast(".") + ".m3u8"
+            } else {
+                it
+            }
         }
+        
+        // println(m3uLink)
 
-        println(m3uLink)
-
-
-        M3u8Helper.generateM3u8(
-            this.name,
-            m3uLink,
-            "$referer",
-        ).forEach(callback)
+        if (!m3uLink.isNullOrBlank()) {
+            M3u8Helper.generateM3u8(
+                this.name,
+                m3uLink,
+                "$referer",
+            ).forEach(callback)
+        }
 
 
         document.select("script").map { script ->
