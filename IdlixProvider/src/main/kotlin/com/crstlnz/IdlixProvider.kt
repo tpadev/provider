@@ -312,9 +312,9 @@ class IdlixProvider : MainAPI() {
         println(m3uLink)
         
         // Replace .txt at the end with .m3u8
-        if (m3uLink.endsWith(".txt")) {
-            m3uLink = m3uLink.substringBeforeLast(".") + ".m3u8"
-        }
+        //if (m3uLink.endsWith(".txt")) {
+        //    m3uLink = m3uLink.substringBeforeLast(".") + ".m3u8"
+        //}
 
 
         M3u8Helper.generateM3u8(
