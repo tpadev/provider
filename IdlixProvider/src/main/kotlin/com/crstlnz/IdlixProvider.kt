@@ -11,6 +11,7 @@ import org.jsoup.nodes.Element
 import java.net.URI
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.util.Base64
 
 class IdlixProvider : MainAPI() {
     override var mainUrl = "https://idlixian.com"
@@ -254,16 +255,41 @@ class IdlixProvider : MainAPI() {
         return true
     }
 
-    private fun createKey(r: String, m: String): String {
-        val rList = r.split("\\x").toTypedArray()
-        var n = ""
-        val decodedM = String(base64Decode(m.split("").reversed().joinToString("")).toCharArray())
-        for (s in decodedM.split("|")) {
-            n += "\\x" + rList[Integer.parseInt(s) + 1]
-        }
-        return n
+    //private fun createKey(r: String, m: String): String {
+    //    val rList = r.split("\\x").toTypedArray()
+    //    var n = ""
+    //    val decodedM = String(base64Decode(m.split("").reversed().joinToString("")).toCharArray())
+    //    for (s in decodedM.split("|")) {
+    //        n += "\\x" + rList[Integer.parseInt(s) + 1]
+    //    }
+    //    return n
+    //}
+
+    private fun addBase64Padding(b64String: String): String {
+        val padding = (4 - b64String.length % 4) % 4
+        return b64String + "=".repeat(padding)
     }
 
+    private fun createKey(r: String, e: String): String {
+        // Split r into 2-char chunks, stepping by 4
+        val rList = (2 until r.length step 4).map { r.substring(it, it + 2) }
+        // Reverse e and pad
+        val mPadded = addBase64Padding(e.reversed())
+
+        val decodedM: String = try {
+            String(Base64.getDecoder().decode(mPadded))
+        } catch (ex: IllegalArgumentException) {
+            println("Base64 decoding error: ${ex.message}")
+            return ""
+        }
+        
+        val decodedMList = decodedM.split("|")
+        return decodedMList.mapNotNull { s ->
+            s.toIntOrNull()?.takeIf { it < rList.size }?.let { "\\x${rList[it]}" }
+        }.joinToString("")
+    }
+
+    
     private fun String.fixBloat(): String {
         return this.replace("\"", "").replace("\\", "")
     }
