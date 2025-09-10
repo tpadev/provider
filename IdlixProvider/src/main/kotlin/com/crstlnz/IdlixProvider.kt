@@ -243,7 +243,7 @@ class IdlixProvider : MainAPI() {
             val metrix = AppUtils.parseJson<AesData>(json.embed_url).m
             val password = createKey(json.key, metrix)
             val decrypted = AesHelper.cryptoAESHandler(json.embed_url, password.toByteArray(), false)?.fixBloat() ?: return@apmap
-
+            println("Decrypted ${decrypted}")
             when {
                 !decrypted.contains("youtube") -> getUrl(decrypted, "$directUrl/", subtitleCallback, callback)
                 else -> return@apmap
