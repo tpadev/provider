@@ -122,7 +122,7 @@ class MovieBox : MainAPI() {
         )
 
         println(res.text)
-        log.i(res.text)
+        log.i("newTAG", "this come after res.txt")
         val data = res.parsed<HomeSearch>()
         return newHomePageResponse(request.name, data.data?.subjectList?.map {
             newMovieSearchResponse(
