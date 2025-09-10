@@ -151,7 +151,6 @@ class IdlixProvider : MainAPI() {
         val request = app.get(url)
         directUrl = getBaseUrl(request.url)
         val document = request.document
-        println(document)
         val title =
             document.selectFirst("div.data > h1")?.text()?.replace(Regex("\\(\\d{4}\\)"), "")
                 ?.trim().toString()
@@ -229,6 +228,7 @@ class IdlixProvider : MainAPI() {
     ): Boolean {
 
         val document = app.get(data).document
+        println(document)
         document.select("ul#playeroptionsul > li").map {
             Triple(
                 it.attr("data-post"),
@@ -244,7 +244,7 @@ class IdlixProvider : MainAPI() {
             val metrix = AppUtils.parseJson<AesData>(json.embed_url).m
             val password = createKey(json.key, metrix)
             val decrypted = AesHelper.cryptoAESHandler(json.embed_url, password.toByteArray(), false)?.fixBloat() ?: return@apmap
-            println("Decrypted ${decrypted}")
+            
             when {
                 !decrypted.contains("youtube") -> getUrl(decrypted, "$directUrl/", subtitleCallback, callback)
                 else -> return@apmap
